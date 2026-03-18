@@ -1,0 +1,1532 @@
+<!-- method.html : Xenodex Method (pure HTML / JS / CSS) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xenodex Method</title>
+  <link rel="icon" type="image/png" href="../images/logo_white.png">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind via CDN for rapid styling -->
+  <!-- Main site styles for header/footer -->
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Narrative text styling */
+    .narrative-text {
+      font-size: 1.5rem;
+      font-family: 'Cormorant Garamond', 'Georgia', serif;
+      font-weight: 400;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+      color: #000;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+      position: relative;
+      letter-spacing: 0.01em;
+      max-width: 1000px;
+      line-height: 1.7;
+      text-align: left;
+      white-space: pre-line;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .narrative-text::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        #B8B8B8 50%,
+        transparent 100%
+      );
+    }
+    
+    .narrative-text .intro-blend {
+      font-size: 2.1rem;
+      font-family: 'Cormorant Garamond', 'Georgia', serif;
+      font-style: italic;
+      font-weight: 600;
+      color: #1a1a1a;
+      letter-spacing: 0.02em;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+      display: inline-block;
+      margin-right: 1px;
+      position: relative;
+    }
+    
+    /* Responsive adjustments for narrative text */
+    @media (max-width: 768px) {
+      .narrative-text {
+        font-size: 1.4rem;
+        line-height: 1.6;
+      }
+      
+      .narrative-text .intro-blend {
+        font-size: 1.7rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .narrative-text {
+        font-size: 1.2rem;
+      }
+      
+      .narrative-text .intro-blend {
+        font-size: 1.5rem;
+      }
+    }
+    
+    /* Mobile responsiveness improvements */
+    @media (max-width: 768px) {
+      .text-4xl { font-size: 1.875rem !important; }
+      .text-5xl { font-size: 2.25rem !important; }
+      .text-xl { font-size: 1.125rem !important; }
+      .px-12 { padding-left: 2rem !important; padding-right: 2rem !important; }
+      .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
+      .mb-16 { margin-bottom: 2rem !important; }
+      
+      /* Pipeline grid adjustments */
+      #pipelineGrid { padding: 0 !important; }
+      .tier { font-size: 0.75rem !important; }
+    }
+    
+    /* Force vertical navigation display */
+    #api-nav ul > li {
+      display: block !important;
+      margin-bottom: 0.5rem !important;
+    }
+    #api-nav ul ul {
+      display: block !important;
+      margin-left: 1.5rem !important;
+      margin-top: 0.25rem !important;
+    }
+    #api-nav ul ul > li {
+      display: block !important;
+      margin-bottom: 0.25rem !important;
+    }
+    #api-nav a {
+      display: block !important;
+      width: 100% !important;
+    }
+    /* Ensure no flex or inline display */
+    #api-nav * {
+      flex-direction: column !important;
+    }
+    #api-nav ul {
+      flex-direction: column !important;
+      display: block !important;
+    }
+  </style>
+  
+  <!-- Load centralized scroll effects module -->
+  <script src="../components/scroll-effects.js"></script>
+  
+  <script>
+    // Page-specific functionality (mobile nav, pipeline diagram, etc.)
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      let lastScrollY = window.scrollY;
+      let ticking = false;
+      
+      // Mobile navigation handler
+      const mobileNav = document.getElementById('mobile-nav');
+      if (mobileNav) {
+        mobileNav.addEventListener('change', function(e) {
+          if (e.target.value) {
+            const targetId = e.target.value;
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+              // Hide all content sections
+              document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+              });
+              
+              // Show only the selected section
+              targetSection.style.display = 'block';
+              
+              // Scroll to the container div that holds all the content
+              const container = document.querySelector('.details-section .container');
+              if (container) {
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+              
+              // Update the pipeline diagram to match the selection
+              const match = targetId.match(/#(.+)-([a-d])(\d)/);
+              if (match) {
+                const letter = match[2].toUpperCase();
+                const colIdx = letter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
+                const tierIdx = parseInt(match[3]) - 1;
+                
+                selectedTier = { tierIdx: tierIdx, colIdx: colIdx };
+                clearHighlight();
+                highlightTier(tierIdx, colIdx);
+              }
+              
+              // Don't reset the select - keep the current selection visible
+            }
+          }
+        });
+      }
+      
+      // Set default center position for gradient effects
+      document.querySelectorAll('section').forEach(section => {
+        section.style.setProperty('--mouse-x', '0.5');
+        section.style.setProperty('--mouse-y', '0.5');
+      });
+      
+      // Calculate document scroll progress (0 at top, 1 at bottom)
+      function getScrollProgress() {
+        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+        return scrollHeight > 0 ? window.scrollY / scrollHeight : 0;
+      }
+      
+      // Primary scroll handler - Based on Y position
+      function handleScroll() {
+        const scrollY = window.scrollY;
+        
+        // Global scroll progress (0-1)
+        const globalProgress = getScrollProgress();
+        
+        // Get viewport height for calculations
+        const viewportHeight = window.innerHeight;
+        
+        // Apply reflection effects based on Y position to all sections
+        document.querySelectorAll('section').forEach(section => {
+          const rect = section.getBoundingClientRect();
+          const sectionTop = rect.top;
+          
+          // Calculate how centered the section is in the viewport
+          const centeredness = 1 - (2 * Math.abs(0.5 - ((rect.top + rect.height/2) / viewportHeight)));
+          
+          // Calculate section-specific Y position value (0 to 1)
+          const sectionYPosition = Math.min(1, Math.max(0, 
+            (viewportHeight - sectionTop) / (viewportHeight + rect.height)
+          ));
+          
+          // Apply dynamic background effects to all sections
+          if (section.style.background || section.style.backgroundImage) {
+            // Create dynamic gradient movement
+            const waveX = 50 + (15 * Math.sin(globalProgress * Math.PI * 2));
+            const waveY = 50 + (10 * Math.cos(globalProgress * Math.PI * 3));
+            section.style.backgroundPosition = effectsEnabled ? 
+              `${waveX}% ${waveY}%` : 
+              '50% 50%';
+            
+            // Set CSS custom properties for pseudo-element effects
+            if (rect.top < viewportHeight && rect.bottom > 0) {
+              const intensity = Math.max(0.1, Math.min(0.9, centeredness * 1.5));
+              const reflectionX = 50 + (30 * Math.sin(globalProgress * Math.PI * 3));
+              const reflectionY = 50 + (30 * Math.cos(globalProgress * Math.PI * 2));
+              
+              if (effectsEnabled) {
+                section.style.setProperty('--scroll-progress', intensity.toFixed(2));
+                section.style.setProperty('--reflection-position', `${reflectionX}% ${reflectionY}%`);
+              } else {
+                section.style.setProperty('--scroll-progress', '0');
+                section.style.setProperty('--reflection-position', '50% 50%');
+              }
+            } else {
+              section.style.setProperty('--scroll-progress', effectsEnabled ? "0.1" : "0");
+            }
+          }
+        });
+        
+        // Store current scroll position
+        lastScrollY = scrollY;
+      }
+      
+      // Smooth header fade based on scroll position
+      const updateHeaderFade = () => {
+        const currentScrollY = window.scrollY;
+        const header = document.querySelector('header');
+        const heroSection = document.querySelector('section');
+        
+        if (!header || !heroSection) return;
+        
+        const heroHeight = heroSection.offsetHeight;
+        
+        // If effects are disabled, keep header fully visible
+        if (!effectsEnabled) {
+          header.style.opacity = '1';
+          return;
+        }
+        
+        // Set fade threshold to 70% of hero section height
+        const fadeThreshold = heroHeight * 0.7;
+        
+        // Calculate progress (0 at top, 1 at 70% of hero height)
+        const fadeProgress = Math.min(1, Math.max(0, currentScrollY / fadeThreshold));
+        
+        // Apply smooth cosine easing for natural fade
+        const eased = (1 - Math.cos(fadeProgress * Math.PI)) / 2;
+        
+        // Calculate opacity
+        const opacity = Math.max(0, 1 - eased);
+        
+        // Apply opacity
+        header.style.opacity = opacity.toFixed(2);
+      };
+      
+      // Throttle scroll events for performance
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          window.requestAnimationFrame(function() {
+            handleScroll();
+            updateHeaderFade();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+      
+      // Handle resize events
+      window.addEventListener('resize', function() {
+        handleScroll();
+      });
+      
+      // Initial call to set up elements
+      handleScroll();
+    });
+  </script>
+  <style>
+    /* slow spin utility */
+    @keyframes spin-slow {from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+    .animate-spin-slow {animation: spin-slow 20s linear infinite;}
+    
+    /* current status indicator - green glow on left edge */
+    .in-development {
+      position: relative;
+      overflow: hidden;
+    }
+    .in-development::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: #10b981;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.8), 
+                  inset 0 0 8px rgba(16, 185, 129, 0.6);
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; }
+    }
+    
+    /* Imperial Chrome color scheme ONLY for diagram section */
+    .pipeline-diagram .chrome-1 { 
+      background: linear-gradient(145deg, #F8F8F8 0%, #E8E8E8 15%, #CFCFCF 30%, #B8B8B8 50%, #D0D0D0 70%, #E0E0E0 85%, #F5F5F5 100%) !important;
+      box-shadow: 
+        inset 0 3px 8px rgba(255,255,255,0.8), 
+        inset 0 -3px 8px rgba(0,0,0,0.15), 
+        0 8px 32px rgba(0,0,0,0.2),
+        0 4px 16px rgba(0,0,0,0.1),
+        0 1px 4px rgba(0,0,0,0.05) !important;
+      border: 1px solid rgba(255,255,255,0.3) !important;
+    }
+    .pipeline-diagram .chrome-2 { 
+      background: linear-gradient(145deg, #FAFAFA 0%, #F0F0F0 15%, #D8D8D8 30%, #C0C0C0 50%, #D5D5D5 70%, #E8E8E8 85%, #F7F7F7 100%) !important;
+      box-shadow: 
+        inset 0 3px 8px rgba(255,255,255,0.9), 
+        inset 0 -3px 8px rgba(0,0,0,0.15), 
+        0 8px 32px rgba(0,0,0,0.2),
+        0 4px 16px rgba(0,0,0,0.1),
+        0 1px 4px rgba(0,0,0,0.05) !important;
+      border: 1px solid rgba(255,255,255,0.4) !important;
+    }
+    .pipeline-diagram .chrome-3 { 
+      background: linear-gradient(145deg, #F6F6F6 0%, #EEEEEE 15%, #DDDDDD 30%, #A9A9A9 50%, #C8C8C8 70%, #E2E2E2 85%, #F4F4F4 100%) !important;
+      box-shadow: 
+        inset 0 3px 8px rgba(255,255,255,0.7), 
+        inset 0 -3px 8px rgba(0,0,0,0.18), 
+        0 8px 32px rgba(0,0,0,0.2),
+        0 4px 16px rgba(0,0,0,0.1),
+        0 1px 4px rgba(0,0,0,0.05) !important;
+      border: 1px solid rgba(255,255,255,0.3) !important;
+    }
+    .pipeline-diagram .chrome-4 { 
+      background: linear-gradient(145deg, #F3F3F3 0%, #E5E5E5 15%, #C5C5C5 30%, #B8B8B8 50%, #D2D2D2 70%, #E0E0E0 85%, #F1F1F1 100%) !important;
+      box-shadow: 
+        inset 0 3px 8px rgba(255,255,255,0.8), 
+        inset 0 -3px 8px rgba(0,0,0,0.15), 
+        0 8px 32px rgba(0,0,0,0.2),
+        0 4px 16px rgba(0,0,0,0.1),
+        0 1px 4px rgba(0,0,0,0.05) !important;
+      border: 1px solid rgba(255,255,255,0.3) !important;
+    }
+    
+    /* Metallic text effects */
+    .metallic-text {
+      background: linear-gradient(145deg, #F8F8F8, #E0E0E0, #C8C8C8, #E0E0E0, #F0F0F0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
+    }
+    
+    /* Apply the exact same background system from index.html */
+    body {
+      background: #F1F1F1;
+      position: relative;
+      overflow-x: hidden;
+      font-family: 'Inter', sans-serif;
+      background-image: 
+          radial-gradient(ellipse at top, #F8F8F8, #F1F1F1),
+          linear-gradient(135deg, 
+              #F5F5F5 0%,
+              #EEEEEE 25%,
+              #F2F2F2 50%,
+              #E8E8E8 75%,
+              #F0F0F0 100%
+          ),
+          linear-gradient(45deg, 
+              rgba(255, 255, 255, 0.1) 25%, 
+              transparent 25%, 
+              transparent 50%, 
+              rgba(255, 255, 255, 0.1) 50%, 
+              rgba(255, 255, 255, 0.1) 75%, 
+              transparent 75%, 
+              transparent);
+      background-size: 100%, 100%, 100px 100px;
+      background-attachment: fixed;
+    }
+
+    /* Add subtle metallic texture overlay exactly like index.html */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(255,255,255,0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%),
+        linear-gradient(45deg, transparent 49%, rgba(255,255,255,0.02) 50%, transparent 51%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Enhanced sections with dynamic lighting effects */
+    section {
+      position: relative;
+      overflow: hidden;
+      background-size: 400% 400%;
+      transition: background-position 0.8s ease-out;
+      --scroll-progress: 0;
+      --reflection-position: 50% 50%;
+    }
+
+    /* Add reflection and lighting effects to all sections */
+    section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(
+          circle at var(--reflection-position, 50%) 50%, 
+          rgba(255, 255, 255, 0.4) 0%, 
+          transparent 70%
+        );
+      z-index: 1;
+      opacity: var(--scroll-progress, 0.3);
+      transition: none;
+      pointer-events: none;
+    }
+
+    section::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.1) 20%,
+          rgba(255, 255, 255, 0.4) 25%,
+          rgba(255, 255, 255, 0.1) 30%,
+          transparent 100%
+        );
+      background-size: 200% 100%;
+      background-position: var(--reflection-position, 0%) 0;
+      z-index: 2;
+      transform: skewX(-20deg);
+      opacity: var(--scroll-progress, 0);
+      transition: none;
+      pointer-events: none;
+    }
+
+    /* Ensure content appears above effects */
+    section > * {
+      position: relative;
+      z-index: 3;
+    }
+    
+    /* Override header container to align logo far left when no navigation */
+    header .container {
+      justify-content: flex-start !important;
+      padding-left: 20px !important;
+    }
+
+    /* Make all containers full width except hero */
+    .container {
+      max-width: none !important;
+      width: 100% !important;
+    }
+    
+    /* Override for hero container to match index.html exactly */
+    .hero .container {
+      width: 90% !important;
+      max-width: 1200px !important;
+    }
+
+    /* Responsive padding for full width layout */
+    section {
+      padding-left: 2rem !important;
+      padding-right: 2rem !important;
+    }
+
+    @media (max-width: 768px) {
+      section {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+      }
+    }
+    
+    /* Two Panel Navigation Styles */
+    .nav-link.active {
+      font-weight: 900 !important;
+      color: #000000 !important;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    .nav-link:hover {
+      color: #000000 !important;
+    }
+    
+    /* Custom scrollbar for right panel */
+    .w-2\/3.overflow-y-auto::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .w-2\/3.overflow-y-auto::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .w-2\/3.overflow-y-auto::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+    
+    .w-2\/3.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+    
+    .logo {
+      margin-left: 0 !important;
+    }
+    
+    /* Position nav on the right side */
+    header .container {
+      justify-content: space-between !important;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900 scroll-smooth" style="background: radial-gradient(ellipse at top, #F8F8F8, #F1F1F1), linear-gradient(135deg, #F5F5F5 0%, #EEEEEE 25%, #F2F2F2 50%, #E8E8E8 75%, #F0F0F0 100%); font-family: 'Inter', sans-serif; color: #000000; position: relative;">
+  
+  <script src="../components/header.js"></script>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <h1>The Method</h1>
+      <p class="subtitle">Unlocking Genetics Through Systematic Analysis</p>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section id="problem" class="px-6 py-24 w-full" style="background: transparent;">
+    <div class="container relative z-10" style="max-width: 1200px;">
+      <div class="text-center">
+        <h2 class="text-5xl md:text-6xl font-black mb-6" style="color: #000000; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">THE IMPASSE</h2>
+        <div class="mt-8 text-left max-w-3xl mx-auto">
+          <p class="narrative-text"><span class="intro-blend">For millennia,</span> attempts to decode personality have exhausted resources and reached dead ends. <br><br>Early astrologers ran out of credibility linking personality to celestial alignments. <br><br>Phrenologists came up empty-headed measuring skull shapes. <br><br>Modern efforts by research institutions and Big Tech have repeatedly burned through budgets and eventually abandoned the pursuit. <br><br>We stand before an unsolved question. The destination is known; yet its path remains hidden.. <br><br>The only certainty is that the path forward is littered with the remains of past attempts. <br><br><span class="intro-blend">What makes this any different?</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- PERFORMANCE-DRIVEN ARCHITECTURE -->
+  <section id="architecture" class="approach performance-architecture">
+    <div class="container">
+      <div class="story-content">
+        <h2 class="text-5xl md:text-6xl font-black mb-6" style="color: #000; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">THE PARADIGM</h2>
+        
+        <div id="architectureDetails">
+          <div class="space-y-8">
+            <p class="text-xl md:text-2xl leading-relaxed mb-8" style="color: #000; font-family: 'Inter', sans-serif; font-weight: 400; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">
+              The paradigm implements a systematic engineering cycle. Each pipeline stage begins with minimal viable complexity and scales incrementally based on empirical performance analysis.
+            </p>
+
+            <!-- Two Column Layout: Flowchart and Text -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 my-12 items-start">
+              <!-- Left Column: Flowchart -->
+              <div class="flex justify-center lg:justify-end">
+                <img src="../images/method_flowchart.svg" alt="Methodology Flowchart" style="width: 80%; max-width: 500px; height: auto;">
+              </div>
+              
+              <!-- Right Column: Pipeline Stages and Implementation Tiers -->
+              <div class="space-y-8">
+                <div>
+                  <h3 class="text-4xl font-bold mb-4 flex items-center gap-3" style="color: #000; font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.01em; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">Stages <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 12H17M7 12L11 8M7 12L11 16M17 12L13 8M17 12L13 16"/></svg></h3>
+                  <p class="text-lg leading-relaxed text-left" style="color: #000; font-family: 'Inter', sans-serif; font-weight: 400; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3); text-align: left;">A consistent modular architecture spanning data ingestion, feature engineering, model training, and inference stages. The pipeline structure remains unchanged across all implementation levels.</p>
+                </div>
+                
+                <div>
+                  <h3 class="text-4xl font-bold mb-4 flex items-center gap-3" style="color: #000; font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.01em; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">Tiers <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 7V17M12 7L16 11M12 7L8 11M12 17L16 13M12 17L8 13"/></svg></h3>
+                  <p class="text-lg leading-relaxed text-left" style="color: #000; font-family: 'Inter', sans-serif; font-weight: 400; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3); text-align: left;">Each pipeline stage operates at progressively sophisticated implementation tiers. Higher tiers are deployed only when profiling identifies that specific stage as a performance bottleneck requiring optimization.</p>
+                </div>
+              </div>
+            </div>
+            
+            <h3 class="text-5xl font-bold mt-10 mb-4" style="color: #000; font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.01em; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">Operational Efficiency</h3>
+            <p class="text-lg leading-relaxed mb-6" style="color: #000; font-family: 'Inter', sans-serif; font-weight: 400; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">Resource allocation driven by empirical performance metrics prevents premature optimization while ensuring scalable, production-ready machine learning systems.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- COMPLEXITY PIPELINE -->
+  <section id="pipeline" class="px-6 pb-8 pt-16 w-full pipeline-diagram" style="background: transparent;">
+    <!-- Header -->
+    <div class="mb-16 text-center">
+      <h2 class="text-5xl md:text-6xl font-black mb-3" style="color: #000; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">THE ARCHITECTURE</h2>
+      <p class="text-2xl leading-relaxed mb-3" style="color: #000; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: -0.01em; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">Consistent Stages. Scalable Complexity.</p>
+    </div>
+    
+    <div class="flex justify-center w-full overflow-x-auto">
+      <div id="pipelineGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 relative w-full px-4 md:px-0" style="min-width: 100%; max-width: 95%;">
+        <!-- Pipeline step arrows will be added by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Legend directly beneath diagram -->
+    <div class="flex items-center justify-center gap-8 text-base mt-8 mb-4" style="color: #666; font-weight: 400;">
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-1 rounded" style="background: #C0C0C0;"></div>
+        <span>Pipeline Stages (X-Axis)</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-1 h-4 rounded" style="background: #B8B8B8;"></div>
+        <span>Implementation Tiers (Y-Axis)</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 relative" style="background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);"></div>
+        <span>In Development</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- PIPELINE SPECIFICATIONS - Two Panel Layout -->
+  <section class="px-6 pb-32 w-full details-section" id="details" style="background: transparent;">
+    <div class="container" style="max-width: none; width: 100%;">
+      <!-- Mobile Navigation Dropdown -->
+      <div class="md:hidden mb-6">
+        <select id="mobile-nav" class="w-full p-3 border border-gray-300 rounded-lg" style="background: white; color: #000;">
+          <option value="">Select a section...</option>
+          <optgroup label="A) Data Pipeline">
+            <option value="#data-pipeline-a1">A1) Curated Dataset</option>
+            <option value="#data-pipeline-a2">A2) Hybrid Annotation</option>
+            <option value="#data-pipeline-a3">A3) Synthetic Generation</option>
+          </optgroup>
+          <optgroup label="B) Feature Engineering">
+            <option value="#feature-engineering-b1">B1) Text Features</option>
+            <option value="#feature-engineering-b2">B2) Audio Features</option>
+            <option value="#feature-engineering-b3">B3) Visual Features</option>
+            <option value="#feature-engineering-b4">B4) Behavioral Features</option>
+          </optgroup>
+          <optgroup label="C) ML Architecture">
+            <option value="#ml-architecture-c1">C1) Monolithic Model</option>
+            <option value="#ml-architecture-c2">C2) Ensemble Architecture</option>
+            <option value="#ml-architecture-c3">C3) Hierarchical System</option>
+          </optgroup>
+          <optgroup label="D) Inference System">
+            <option value="#inference-system-d1">D1) Binary Classification</option>
+            <option value="#inference-system-d2">D2) Probabilistic Inference</option>
+          </optgroup>
+        </select>
+      </div>
+      
+      <!-- Two Panel Layout - Mobile Responsive -->
+      <div class="flex flex-col md:flex-row gap-0 w-full" style="max-width: 95%; margin: 0 auto; min-height: 600px;">
+        <!-- Left Navigation Panel - Hidden on mobile, shown as accordion -->
+        <div class="hidden md:block sticky top-0 overflow-y-auto overflow-x-hidden" style="background: transparent; width: auto;">
+          <nav id="api-nav" class="pr-6 pl-0 pt-6">
+            <h3 class="text-2xl font-bold mb-6" style="color: #000; font-weight: 800; letter-spacing: -0.01em; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">Pipeline Stages</h3>
+            
+            <ul class="space-y-2">
+              <!-- Data Pipeline -->
+              <li>
+                <a href="#data-pipeline" class="nav-link nav-header block whitespace-nowrap text-base font-bold hover:font-black transition-all duration-200" style="color: #000; font-weight: 600; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">A) Data Pipeline</a>
+                <ul class="ml-6 mt-1 space-y-1">
+                  <li><a href="#data-pipeline-a1" class="nav-link active block whitespace-nowrap text-base font-medium hover:font-bold transition-all duration-200" style="color: #000; font-weight: 400; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">A1) Curated Dataset</a></li>
+                  <li><a href="#data-pipeline-a2" class="nav-link block whitespace-nowrap text-sm font-medium hover:font-bold transition-all duration-200" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">A2) Hybrid Annotation</a></li>
+                  <li><a href="#data-pipeline-a3" class="nav-link block whitespace-nowrap text-sm font-medium hover:font-bold transition-all duration-200" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">A3) Synthetic Generation</a></li>
+                </ul>
+              </li>
+              
+              <!-- Feature Engineering -->
+              <li class="mt-3">
+                <a href="#feature-engineering" class="nav-link nav-header block whitespace-nowrap text-sm font-bold hover:font-black transition-all duration-200" style="color: #000000; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">B) Feature Engineering</a>
+                <ul class="ml-6 mt-1 space-y-1">
+                  <li><a href="#feature-engineering-b1" class="nav-link block whitespace-nowrap text-sm font-medium hover:font-bold transition-all duration-200" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">B1) Text Features</a></li>
+                  <li><a href="#feature-engineering-b2" class="nav-link block whitespace-nowrap text-sm font-medium hover:font-bold transition-all duration-200" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">B2) Audio Features</a></li>
+                  <li><a href="#feature-engineering-b3" class="nav-link block whitespace-nowrap text-sm font-medium hover:font-bold transition-all duration-200" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">B3) Visual Features</a></li>
+                  <li><a href="#feature-engineering-b4" class="nav-link block whitespace-nowrap text-sm font-medium hover:font-bold transition-all duration-200" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">B4) Behavioral Features</a></li>
+                </ul>
+              </li>
+              
+              <!-- ML Architecture -->
+              <li class="mt-3">
+                <a href="#ml-architecture" class="nav-link nav-header block whitespace-nowrap text-sm font-bold hover:font-black transition-all duration-200" style="color: #000000; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">C) ML Architecture</a>
+                <ul class="ml-6 mt-1 space-y-1">
+                  <li><a href="#ml-architecture-c1" class="nav-link block whitespace-nowrap text-sm font-medium hover:font-bold transition-all duration-200" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">C1) Monolithic Model</a></li>
+                  <li><a href="#ml-architecture-c2" class="nav-link block whitespace-nowrap text-sm font-medium hover:font-bold transition-all duration-200" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">C2) Ensemble Architecture</a></li>
+                  <li><a href="#ml-architecture-c3" class="nav-link block whitespace-nowrap text-sm font-medium hover:font-bold transition-all duration-200" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">C3) Hierarchical System</a></li>
+                </ul>
+              </li>
+              
+              <!-- Inference System -->
+              <li class="mt-3">
+                <a href="#inference-system" class="nav-link nav-header block whitespace-nowrap text-sm font-bold hover:font-black transition-all duration-200" style="color: #000000; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">D) Inference System</a>
+                <ul class="ml-6 mt-1 space-y-1">
+                  <li><a href="#inference-system-d1" class="nav-link block whitespace-nowrap text-sm font-medium hover:font-bold transition-all duration-200" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">D1) Binary Classification</a></li>
+                  <li><a href="#inference-system-d2" class="nav-link block whitespace-nowrap text-sm font-medium hover:font-bold transition-all duration-200" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">D2) Probabilistic Inference</a></li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        
+        <!-- Right Content Panel - Full width on mobile -->
+        <div class="flex-1 overflow-y-auto px-4 md:px-0" style="background: transparent; padding-left: 0; border-left: none;">
+          <style>
+            @media (min-width: 768px) {
+              .flex-1.overflow-y-auto {
+                padding-left: 2rem !important;
+                border-left: 1px solid rgba(0, 0, 0, 0.1) !important;
+              }
+            }
+          </style>
+          <div id="api-content" class="p-6">
+            
+            <!-- Data Pipeline Sections -->
+            <div id="data-pipeline-a1" class="content-section mb-12">
+              <h2 class="text-2xl font-black mb-4 flex items-center" style="color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">
+                <span class="w-4 h-4 rounded-full chrome-1 mr-3" style="display: inline-block;"></span>
+                A1) Curated Dataset
+              </h2>
+              <p class="text-base mb-4" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Human-annotated ground truth data with expert validation.</p>
+              <div class="pl-6 border-l-2 border-opacity-20" style="border-color: rgba(255, 255, 255, 0.3);">
+                <p class="text-sm leading-relaxed" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Production-grade baseline utilizing existing validated personality assessment datasets with established psychometric properties and inter-rater reliability metrics.</p>
+              </div>
+            </div>
+            
+            <div id="data-pipeline-a2" class="content-section mb-12">
+              <h2 class="text-2xl font-black mb-4 flex items-center" style="color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">
+                <span class="w-4 h-4 rounded-full chrome-1 mr-3" style="display: inline-block;"></span>
+                A2) Hybrid Annotation
+              </h2>
+              <p class="text-base mb-4" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">AI-assisted annotation with human quality assurance workflows.</p>
+              <div class="pl-6 border-l-2 border-opacity-20" style="border-color: rgba(255, 255, 255, 0.3);">
+                <p class="text-sm leading-relaxed" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Scalable annotation pipeline combining machine learning pre-labeling with human expert validation, enabling rapid dataset expansion while maintaining annotation quality standards.</p>
+              </div>
+            </div>
+            
+            <div id="data-pipeline-a3" class="content-section mb-12">
+              <h2 class="text-2xl font-black mb-4 flex items-center" style="color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">
+                <span class="w-4 h-4 rounded-full chrome-1 mr-3" style="display: inline-block;"></span>
+                A3) Synthetic Generation
+              </h2>
+              <p class="text-base mb-4" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Synthetic data generation with automated quality validation pipelines.</p>
+              <div class="pl-6 border-l-2 border-opacity-20" style="border-color: rgba(255, 255, 255, 0.3);">
+                <p class="text-sm leading-relaxed" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Advanced synthetic data generation leveraging large language models with specialized prompt engineering and automated quality assurance. Utilizes Embodier (content generation), Prompter (guidance system), and Classifier (evaluation) modules working in concert to create realistic interaction patterns and maintain data quality standards.</p>
+              </div>
+            </div>
+            
+            <!-- Feature Engineering Sections -->
+            <div id="feature-engineering-b1" class="content-section mb-12">
+              <h2 class="text-2xl font-black mb-4 flex items-center" style="color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">
+                <span class="w-4 h-4 rounded-full chrome-2 mr-3" style="display: inline-block;"></span>
+                B1) Text Features
+              </h2>
+              <p class="text-base mb-4" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Natural language processing with semantic embedding extraction.</p>
+              <div class="pl-6 border-l-2 border-opacity-20" style="border-color: rgba(255, 255, 255, 0.3);">
+                <p class="text-sm leading-relaxed" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Advanced NLP feature extraction including transformer-based embeddings, linguistic pattern analysis, sentiment dynamics, and semantic coherence metrics for personality trait inference.</p>
+              </div>
+            </div>
+            
+            <div id="feature-engineering-b2" class="content-section mb-12">
+              <h2 class="text-2xl font-black mb-4 flex items-center" style="color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">
+                <span class="w-4 h-4 rounded-full chrome-2 mr-3" style="display: inline-block;"></span>
+                B2) Audio Features
+              </h2>
+              <p class="text-base mb-4" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Audio signal processing for prosodic and paralinguistic features.</p>
+              <div class="pl-6 border-l-2 border-opacity-20" style="border-color: rgba(255, 255, 255, 0.3);">
+                <p class="text-sm leading-relaxed" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Signal processing pipeline extracting prosodic features (pitch, rhythm, intensity), voice quality metrics, and paralinguistic cues using state-of-the-art audio analysis frameworks.</p>
+              </div>
+            </div>
+            
+            <div id="feature-engineering-b3" class="content-section mb-12">
+              <h2 class="text-2xl font-black mb-4 flex items-center" style="color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">
+                <span class="w-4 h-4 rounded-full chrome-2 mr-3" style="display: inline-block;"></span>
+                B3) Visual Features
+              </h2>
+              <p class="text-base mb-4" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Computer vision pipeline for facial expression and gesture analysis.</p>
+              <div class="pl-6 border-l-2 border-opacity-20" style="border-color: rgba(255, 255, 255, 0.3);">
+                <p class="text-sm leading-relaxed" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Computer vision system utilizing facial action unit detection, micro-expression analysis, gaze tracking, and gesture recognition for multimodal personality assessment.</p>
+              </div>
+            </div>
+            
+            <div id="feature-engineering-b4" class="content-section mb-12">
+              <h2 class="text-2xl font-black mb-4 flex items-center" style="color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">
+                <span class="w-4 h-4 rounded-full chrome-2 mr-3" style="display: inline-block;"></span>
+                B4) Behavioral Features
+              </h2>
+              <p class="text-base mb-4" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Behavioral analytics capturing interaction patterns and temporal dynamics.</p>
+              <div class="pl-6 border-l-2 border-opacity-20" style="border-color: rgba(255, 255, 255, 0.3);">
+                <p class="text-sm leading-relaxed" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Behavioral analytics capturing keystroke dynamics, response latency patterns, editing behaviors, and temporal interaction signatures as supplementary personality indicators.</p>
+              </div>
+            </div>
+            
+            <!-- ML Architecture Sections -->
+            <div id="ml-architecture-c1" class="content-section mb-12">
+              <h2 class="text-2xl font-black mb-4 flex items-center" style="color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">
+                <span class="w-4 h-4 rounded-full chrome-3 mr-3" style="display: inline-block;"></span>
+                C1) Monolithic Model
+              </h2>
+              <p class="text-base mb-4" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Single deep learning model with multi-task learning objectives.</p>
+              <div class="pl-6 border-l-2 border-opacity-20" style="border-color: rgba(255, 255, 255, 0.3);">
+                <p class="text-sm leading-relaxed" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Unified deep learning architecture implementing multi-task learning for simultaneous personality trait prediction, providing baseline performance metrics and identifying optimization opportunities.</p>
+              </div>
+            </div>
+            
+            <div id="ml-architecture-c2" class="content-section mb-12">
+              <h2 class="text-2xl font-black mb-4 flex items-center" style="color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">
+                <span class="w-4 h-4 rounded-full chrome-3 mr-3" style="display: inline-block;"></span>
+                C2) Ensemble Architecture
+              </h2>
+              <p class="text-base mb-4" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Specialized model ensemble with domain-specific architectures.</p>
+              <div class="pl-6 border-l-2 border-opacity-20" style="border-color: rgba(255, 255, 255, 0.3);">
+                <p class="text-sm leading-relaxed" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Ensemble methodology deploying specialized models for distinct personality dimensions, enabling targeted hyperparameter optimization and domain-specific feature engineering for improved accuracy.</p>
+              </div>
+            </div>
+            
+            <div id="ml-architecture-c3" class="content-section mb-12">
+              <h2 class="text-2xl font-black mb-4 flex items-center" style="color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">
+                <span class="w-4 h-4 rounded-full chrome-3 mr-3" style="display: inline-block;"></span>
+                C3) Hierarchical System
+              </h2>
+              <p class="text-base mb-4" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Hierarchical system with constraint propagation and logical consistency.</p>
+              <div class="pl-6 border-l-2 border-opacity-20" style="border-color: rgba(255, 255, 255, 0.3);">
+                <p class="text-sm leading-relaxed" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Advanced hierarchical architecture with explicit logical constraint enforcement and multi-label classification capabilities. Implements systematic progression from unified modeling to specialized constraint systems, ensuring consistent personality trait predictions across multiple dimensions with production-grade reliability.</p>
+              </div>
+            </div>
+            
+            <!-- Inference System Sections -->
+            <div id="inference-system-d1" class="content-section mb-12">
+              <h2 class="text-2xl font-black mb-4 flex items-center" style="color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">
+                <span class="w-4 h-4 rounded-full chrome-4 mr-3" style="display: inline-block;"></span>
+                D1) Binary Classification
+              </h2>
+              <p class="text-base mb-4" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Discrete classification with confidence thresholding.</p>
+              <div class="pl-6 border-l-2 border-opacity-20" style="border-color: rgba(255, 255, 255, 0.3);">
+                <p class="text-sm leading-relaxed" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Production-ready binary classification system with calibrated confidence thresholds and precision-recall optimization. Provides clear decision boundaries for actionable personality trait predictions, progressing from simple presence/absence determination to establish baseline performance.</p>
+              </div>
+            </div>
+            
+            <div id="inference-system-d2" class="content-section mb-12">
+              <h2 class="text-2xl font-black mb-4 flex items-center" style="color: #000000; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);">
+                <span class="w-4 h-4 rounded-full chrome-4 mr-3" style="display: inline-block;"></span>
+                D2) Probabilistic Inference
+              </h2>
+              <p class="text-base mb-4" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Continuous probability distributions with uncertainty quantification.</p>
+              <div class="pl-6 border-l-2 border-opacity-20" style="border-color: rgba(255, 255, 255, 0.3);">
+                <p class="text-sm leading-relaxed" style="color: #1a1a1a; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">Advanced probabilistic inference engine with continuous personality scoring and uncertainty quantification. Enables detailed personality profiling through calibrated probability distributions, confidence intervals, and nuanced assessment capabilities as data availability and model sophistication increase.</p>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- SCRIPTS -->
+  <script>
+    // Track last selected tier
+    let lastSelectedTier = { tierIdx: 0, colIdx: 0 }; // Default to A1
+    let selectedTier = { tierIdx: 0, colIdx: 0 }; // Track the actively selected tier
+    
+    const DIMENSIONS = [
+      {
+        id: "fidelity",
+        label: "Data Pipeline",
+        color: "chrome-1",
+        tiers: ["Curated Dataset", "Hybrid Annotation", "Synthetic Generation"],
+        desc: [
+          "Human-annotated ground truth data with expert validation.",
+          "AI-assisted annotation with human quality assurance workflows.",
+          "Synthetic data generation with automated quality validation pipelines."
+        ],
+        details: [
+          "Production-grade baseline utilizing existing validated personality assessment datasets with established psychometric properties and inter-rater reliability metrics.",
+          "Scalable annotation pipeline combining machine learning pre-labeling with human expert validation, enabling rapid dataset expansion while maintaining annotation quality standards.",
+          "Advanced synthetic data generation leveraging large language models with specialized prompt engineering and automated quality assurance. Utilizes Embodier (content generation), Prompter (guidance system), and Classifier (evaluation) modules working in concert to create realistic interaction patterns and maintain data quality standards."
+        ]
+      },
+      {
+        id: "modality",
+        label: "Feature Engineering",
+        color: "chrome-2",
+        tiers: ["Text Features", "Audio Features", "Visual Features", "Behavioral Features"],
+        desc: [
+          "Natural language processing with semantic embedding extraction.",
+          "Audio signal processing for prosodic and paralinguistic features.",
+          "Computer vision pipeline for facial expression and gesture analysis.",
+          "Behavioral analytics capturing interaction patterns and temporal dynamics."
+        ],
+        details: [
+          "Advanced NLP feature extraction including transformer-based embeddings, linguistic pattern analysis, sentiment dynamics, and semantic coherence metrics for personality trait inference.",
+          "Signal processing pipeline extracting prosodic features (pitch, rhythm, intensity), voice quality metrics, and paralinguistic cues using state-of-the-art audio analysis frameworks.",
+          "Computer vision system utilizing facial action unit detection, micro-expression analysis, gaze tracking, and gesture recognition for multimodal personality assessment.",
+          "Behavioral analytics capturing keystroke dynamics, response latency patterns, editing behaviors, and temporal interaction signatures as supplementary personality indicators."
+        ]
+      },
+      {
+        id: "architecture",
+        label: "ML Architecture",
+        color: "chrome-3",
+        tiers: ["Monolithic Model", "Ensemble Architecture", "Hierarchical System"],
+        desc: [
+          "Single deep learning model with multi-task learning objectives.",
+          "Specialized model ensemble with domain-specific architectures.",
+          "Hierarchical system with constraint propagation and logical consistency."
+        ],
+        details: [
+          "Unified deep learning architecture implementing multi-task learning for simultaneous personality trait prediction, providing baseline performance metrics and identifying optimization opportunities.",
+          "Ensemble methodology deploying specialized models for distinct personality dimensions, enabling targeted hyperparameter optimization and domain-specific feature engineering for improved accuracy.",
+          "Advanced hierarchical architecture with explicit logical constraint enforcement and multi-label classification capabilities. Implements systematic progression from unified modeling to specialized constraint systems, ensuring consistent personality trait predictions across multiple dimensions with production-grade reliability."
+        ]
+      },
+      {
+        id: "resolution",
+        label: "Inference System",
+        color: "chrome-4",
+        tiers: ["Binary Classification", "Probabilistic Inference"],
+        desc: [
+          "Discrete classification with confidence thresholding.",
+          "Continuous probability distributions with uncertainty quantification."
+        ],
+        details: [
+          "Production-ready binary classification system with calibrated confidence thresholds and precision-recall optimization. Provides clear decision boundaries for actionable personality trait predictions, progressing from simple presence/absence determination to establish baseline performance.",
+          "Advanced probabilistic inference engine with continuous personality scoring and uncertainty quantification. Enables detailed personality profiling through calibrated probability distributions, confidence intervals, and nuanced assessment capabilities as data availability and model sophistication increase."
+        ]
+      }
+    ];
+
+    const pipelineGrid = document.getElementById("pipelineGrid");
+    const detailsSection = document.getElementById("details");
+
+    function buildPipeline() {
+      DIMENSIONS.forEach((dim, colIdx) => {
+        const col = document.createElement("div");
+        const marginClass = colIdx < DIMENSIONS.length - 1 ? "mr-6" : "";
+        col.className = `flex flex-col items-center column-hover cursor-pointer transition-all duration-200 relative ${marginClass}`;
+        col.dataset.column = colIdx;
+        
+        // Add step indicator
+        const stepIndicator = document.createElement("div");
+        stepIndicator.className = "text-xs font-semibold mb-2";
+        stepIndicator.style.color = '#666666';
+        stepIndicator.textContent = `STAGE ${colIdx + 1}`;
+        stepIndicator.style.fontWeight = '700';
+        stepIndicator.style.letterSpacing = '0.1em';
+        col.appendChild(stepIndicator);
+        
+        const header = document.createElement("h3");
+        header.className = "mb-4 text-center text-xl font-black uppercase tracking-wide";
+        header.style.color = '#000000';
+        header.style.fontWeight = '900';
+        header.style.letterSpacing = '0.15em';
+        header.textContent = dim.label;
+        col.appendChild(header);
+        
+        // Add complexity layer indicators
+        dim.tiers.forEach((tier, idx) => {
+          const box = document.createElement("div");
+          box.dataset.dim = dim.id;
+          box.dataset.index = idx;
+          box.dataset.row = idx;
+          box.dataset.column = colIdx;
+          const label = String.fromCharCode(65 + colIdx) + (idx + 1); // A1, B1, etc.
+          box.className = `w-full h-12 mb-2 rounded-xl flex items-center justify-center text-sm font-medium tier relative cursor-pointer transition-all duration-200 border-l-2`;
+          // Current status items (first tier) should be bright, others greyed out
+          if (idx === 0) {
+            box.style.background = 'linear-gradient(145deg, #FAFAFA 0%, #F0F0F0 20%, #E8E8E8 35%, #D0D0D0 50%, #D8D8D8 65%, #E5E5E5 80%, #F2F2F2 100%)';
+            box.style.borderLeftColor = '#10b981';
+            box.style.borderLeftWidth = '5px';
+            box.style.borderRadius = '12px';
+            box.style.opacity = '1';
+            box.style.color = '#000000';
+          } else {
+            box.style.background = 'linear-gradient(145deg, #A8A8A8 0%, #989898 20%, #888888 35%, #787878 50%, #808080 65%, #909090 80%, #A0A0A0 100%)';
+            box.style.borderLeftColor = '#666666';
+            box.style.borderLeftWidth = '5px';
+            box.style.borderRadius = '12px';
+            box.style.opacity = '0.7';
+            box.style.color = '#4a4a4a';
+          }
+          box.style.fontWeight = '700';
+          box.style.fontSize = '0.9rem';
+          box.style.letterSpacing = '0.02em';
+          box.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.5), inset 0 -1px 1px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1)';
+          box.style.position = 'relative';
+          box.style.border = '1px solid rgba(255,255,255,0.3)';
+          
+          // Add current status indicator (green glow) for first tier of each stage
+          if (idx === 0) {
+            box.classList.add('in-development');
+          }
+          box.innerHTML = `<span class="absolute top-1 left-2 text-xs opacity-60">${label}</span><span>${tier}</span>`;
+          // Desktop hover behavior
+          box.addEventListener('mouseenter', () => {
+            if (window.innerWidth >= 768) { // Only on desktop
+              highlightTier(idx, colIdx);
+            }
+          });
+          box.addEventListener('mouseleave', () => {
+            if (window.innerWidth >= 768) { // Only on desktop
+              clearHighlight();
+            }
+          });
+          
+          // Click behavior - enhanced for mobile
+          box.addEventListener('click', () => {
+            selectedTier = { tierIdx: idx, colIdx: colIdx };
+            clearHighlight(); // Clear any existing highlights
+            highlightTier(idx, colIdx); // Apply new highlight
+            
+            // On mobile, update the dropdown to match the selection
+            if (window.innerWidth < 768) {
+              const prefix = ['data-pipeline', 'feature-engineering', 'ml-architecture', 'inference-system'][colIdx];
+              const letter = String.fromCharCode(65 + colIdx).toLowerCase();
+              const targetId = `#${prefix}-${letter}${idx + 1}`;
+              
+              // Update the mobile dropdown
+              const mobileNav = document.getElementById('mobile-nav');
+              if (mobileNav) {
+                mobileNav.value = targetId;
+                // Trigger the change event to update content
+                mobileNav.dispatchEvent(new Event('change'));
+              }
+            }
+          });
+          col.appendChild(box);
+        });
+        
+        // Add pipeline arrow (except for last column) - hidden on mobile
+        if (colIdx < DIMENSIONS.length - 1) {
+          const arrow = document.createElement("div");
+          arrow.className = "hidden md:block absolute top-1/2 -right-8 transform -translate-y-1/2 text-xl z-10";
+          arrow.style.color = '#C0C0C0';
+          arrow.innerHTML = "→";
+          col.appendChild(arrow);
+        }
+        
+        pipelineGrid.appendChild(col);
+      });
+    }
+
+    function buildAccordion() {
+      DIMENSIONS.forEach((dim, colIdx) => {
+        const item = document.createElement("div");
+        item.className = "mb-8 section-item transition-all duration-200";
+        item.style.background = 'transparent';
+        item.dataset.accordion = dim.id;
+        item.dataset.column = colIdx;
+
+        const header = document.createElement("div");
+        header.className = "w-full px-8 py-6 text-left";
+        header.style.background = 'transparent';
+        header.innerHTML = `<span class="font-black text-4xl" style="color: #000; font-weight: 800; letter-spacing: -0.01em; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">${dim.label}</span>`;
+
+        const content = document.createElement("div");
+        content.className = "px-8 pb-8 text-base space-y-4";
+        content.style.color = '#1a1a1a';
+        content.style.fontWeight = '500';
+
+        dim.tiers.forEach((tier, idx) => {
+          const row = document.createElement("div");
+          row.className = "tier-row transition-all duration-200 p-5";
+          row.style.background = 'transparent';
+          row.dataset.dim = dim.id;
+          row.dataset.index = idx;
+          row.dataset.column = colIdx;
+          const label = String.fromCharCode(65 + colIdx) + (idx + 1);
+          
+          const tierHeader = document.createElement("div");
+          tierHeader.className = "flex items-center justify-between cursor-pointer tier-header";
+          tierHeader.innerHTML = `
+            <div class="flex items-start">
+              <div class="w-4 h-4 mt-1 mr-4 rounded-full ${dim.color} opacity-60 dot" data-dim="${dim.id}" data-index="${idx}"></div>
+              <span class="font-bold text-xl" style="color: #000; font-weight: 600; letter-spacing: 0em; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);"><strong style="color: #000;">${label} – ${tier}:</strong> <span class="font-medium text-lg" style="color: #000; font-weight: 400; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);">${dim.desc[idx]}</span></span>
+            </div>
+            <svg class="w-5 h-5 transition-transform tier-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: #666666;"><path d="M6 9l6 6 6-6"/></svg>
+          `;
+          
+          const tierContent = document.createElement("div");
+          tierContent.className = "ml-8 mt-4 p-4 hidden tier-content";
+          tierContent.style.color = '#1a1a1a';
+          tierContent.style.fontWeight = '500';
+          tierContent.style.lineHeight = '1.7';
+          tierContent.style.background = 'transparent';
+          tierContent.innerHTML = `<p class="text-base" style="text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);">${dim.details[idx]}</p>`;
+          
+          tierHeader.addEventListener("click", () => {
+            tierContent.classList.toggle("hidden");
+            tierHeader.querySelector(".tier-arrow").classList.toggle("rotate-180");
+          });
+          
+          row.appendChild(tierHeader);
+          row.appendChild(tierContent);
+          content.appendChild(row);
+        });
+
+        item.appendChild(header);
+        item.appendChild(content);
+        detailsSection.appendChild(item);
+      });
+    }
+    
+    // Apply highlight to selected tier
+    function applySelectedHighlight() {
+      const { tierIdx, colIdx } = selectedTier;
+      document.querySelectorAll('.tier').forEach(tier => {
+        const idx = Number(tier.dataset.index);
+        const column = Number(tier.dataset.column);
+        const dim = DIMENSIONS.find(d => d.id === tier.dataset.dim);
+        if (dim && column === colIdx && idx <= tierIdx) {
+          tier.style.background = 'linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 5%, #F0F0F0 20%, #E8E8E8 35%, #D0D0D0 50%, #D8D8D8 65%, #E5E5E5 80%, #F2F2F2 100%)';
+          tier.style.opacity = '1';
+          tier.style.color = '#000000';
+          tier.style.boxShadow = 'inset 0 2px 3px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1)';
+          if (idx === 0) {
+            tier.style.borderLeftColor = '#10b981';
+          }
+        }
+      });
+    }
+
+    function highlightTier(tierIdx, colIdx) {
+      // Save the last selected tier
+      lastSelectedTier = { tierIdx, colIdx };
+      
+      // Highlight grid tiers
+      document.querySelectorAll('.tier').forEach(tier => {
+        const idx = Number(tier.dataset.index);
+        const column = Number(tier.dataset.column);
+        const dim = DIMENSIONS.find(d => d.id === tier.dataset.dim);
+        if (dim && column === colIdx && idx <= tierIdx) {
+          tier.classList.add(dim.color);
+          tier.style.background = 'linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 5%, #F0F0F0 20%, #E8E8E8 35%, #D0D0D0 50%, #D8D8D8 65%, #E5E5E5 80%, #F2F2F2 100%)';
+          tier.style.opacity = '1';
+          tier.style.color = '#000000';
+          tier.style.fontWeight = '700';
+          tier.style.boxShadow = 'inset 0 2px 3px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1)';
+          tier.style.transform = 'translateY(0)';
+        }
+      });
+      
+      // Highlight specific tier row in section (not the whole section)
+      const tierRow = document.querySelector(`.tier-row[data-column="${colIdx}"][data-index="${tierIdx}"]`);
+      if (tierRow) {
+        const dim = DIMENSIONS[colIdx];
+        tierRow.style.background = '#E8E8E8';
+        tierRow.style.border = '2px solid #C0C0C0';
+        tierRow.classList.add('shadow-lg');
+        tierRow.classList.remove('bg-transparent');
+      }
+      
+      // Highlight navigation and update content
+      const dim = DIMENSIONS[colIdx];
+      if (dim) {
+        // Clear all active nav states
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        
+        // Highlight the specific tier nav item
+        const prefix = dim.id === 'fidelity' ? 'data-pipeline' : 
+                       dim.id === 'modality' ? 'feature-engineering' : 
+                       dim.id === 'architecture' ? 'ml-architecture' : 
+                       'inference-system';
+        const letter = String.fromCharCode(65 + colIdx); // A, B, C, D
+        const navId = `#${prefix}-${letter.toLowerCase()}${tierIdx + 1}`;
+        const navLink = document.querySelector(`a[href="${navId}"]`);
+        if (navLink) {
+          navLink.classList.add('active');
+          // Scroll nav into view if needed
+          navLink.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // Show the corresponding content section
+        document.querySelectorAll('.content-section').forEach(section => {
+          section.style.display = 'none';
+        });
+        const contentSection = document.querySelector(navId);
+        if (contentSection) {
+          contentSection.style.display = 'block';
+          // Scroll content panel to top
+          const rightPanel = document.querySelector('.w-2\\/3.overflow-y-auto');
+          if (rightPanel) {
+            rightPanel.scrollTop = 0;
+          }
+        }
+      }
+    }
+    
+    function clearHighlight() {
+      // Clear grid highlights
+      document.querySelectorAll('.tier').forEach(tier => {
+        const dim = DIMENSIONS.find(d => d.id === tier.dataset.dim);
+        const idx = Number(tier.dataset.row);
+        if (dim) {
+          tier.classList.remove(dim.color, 'transform', 'scale-105');
+          // Keep current status items (first tier) bright
+          if (idx === 0) {
+            tier.style.background = 'linear-gradient(145deg, #FAFAFA 0%, #F0F0F0 20%, #E8E8E8 35%, #D0D0D0 50%, #D8D8D8 65%, #E5E5E5 80%, #F2F2F2 100%)';
+            tier.style.opacity = '1';
+            tier.style.color = '#000000';
+            tier.style.borderLeftColor = '#10b981';
+          } else {
+            tier.style.background = 'linear-gradient(145deg, #A8A8A8 0%, #989898 20%, #888888 35%, #787878 50%, #808080 65%, #909090 80%, #A0A0A0 100%)';
+            tier.style.opacity = '0.7';
+            tier.style.color = '#4a4a4a';
+            tier.style.borderLeftColor = '#666666';
+          }
+          tier.style.fontWeight = '700';
+          tier.style.boxShadow = 'inset 0 2px 4px rgba(255,255,255,0.7), inset 0 -2px 4px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.05)';
+          tier.style.border = '1px solid rgba(255,255,255,0.3)';
+        }
+      });
+      
+      // Clear tier row highlights
+      document.querySelectorAll('.tier-row').forEach(row => {
+        row.style.background = 'transparent';
+        row.style.border = 'none';
+        row.classList.remove('shadow-lg');
+      });
+      
+      // Apply the selected tier highlight
+      applySelectedHighlight();
+      
+      // Show the selected tier content
+      const dim = DIMENSIONS[selectedTier.colIdx];
+      if (dim) {
+        // Clear all active nav states
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        
+        // Highlight the selected nav item
+        const prefix = dim.id === 'fidelity' ? 'data-pipeline' : 
+                       dim.id === 'modality' ? 'feature-engineering' : 
+                       dim.id === 'architecture' ? 'ml-architecture' : 
+                       'inference-system';
+        const letter = String.fromCharCode(65 + selectedTier.colIdx); // A, B, C, D
+        const navId = `#${prefix}-${letter.toLowerCase()}${selectedTier.tierIdx + 1}`;
+        const navLink = document.querySelector(`a[href="${navId}"]`);
+        if (navLink) {
+          navLink.classList.add('active');
+        }
+        
+        // Show only the selected content section
+        document.querySelectorAll('.content-section').forEach(section => {
+          section.style.display = 'none';
+        });
+        const contentSection = document.querySelector(navId);
+        if (contentSection) {
+          contentSection.style.display = 'block';
+        }
+      }
+    }
+    
+    function scrollToDetails(dimId, tierIndex) {
+      const accordion = document.querySelector(`[data-accordion="${dimId}"]`);
+      if (accordion) {
+        // Open only the specific tier content
+        const specificTierRow = accordion.querySelector(`[data-index="${tierIndex}"]`);
+        if (specificTierRow) {
+          const tierContent = specificTierRow.querySelector('.tier-content');
+          const tierArrow = specificTierRow.querySelector('.tier-arrow');
+          
+          if (tierContent && tierArrow) {
+            tierContent.classList.remove('hidden');
+            tierArrow.classList.add('rotate-180');
+          }
+        }
+        
+        accordion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        // Fallback: scroll to details section
+        document.getElementById('details').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function toggleArchitectureDetails() {
+      const details = document.getElementById('architectureDetails');
+      const arrow = document.getElementById('architectureArrow');
+      
+      details.classList.toggle('hidden');
+      arrow.classList.toggle('rotate-180');
+    }
+
+    // Header fade effect
+    let animationId;
+    let ticking = false;
+    
+    function handleScroll() {
+      if (!ticking) {
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+        }
+        
+        const updateHeaderFade = () => {
+          const currentScrollY = window.scrollY;
+          const header = document.querySelector('header');
+          const heroSection = document.querySelector('section'); // First section (hero)
+          const heroHeight = heroSection.offsetHeight;
+          
+          // Set fade threshold to 70% of hero section height
+          const fadeThreshold = heroHeight * 0.7;
+          
+          // Calculate progress (0 at top, 1 at 70% of hero height)
+          const fadeProgress = Math.min(1, Math.max(0, currentScrollY / fadeThreshold));
+          
+          // Apply smooth cosine easing for natural fade
+          const eased = (1 - Math.cos(fadeProgress * Math.PI)) / 2;
+          
+          // Calculate opacity - fully transparent (0) at 70% of hero height
+          const opacity = Math.max(0, 1 - eased);
+          
+          // Apply opacity
+          header.style.opacity = opacity.toFixed(2);
+        };
+        
+        updateHeaderFade();
+        animationId = requestAnimationFrame(updateHeaderFade);
+        
+        ticking = false;
+      }
+      ticking = true;
+    }
+    
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll);
+
+    // init
+    buildPipeline();
+    initTwoPanelNavigation();
+    
+    // Apply initial selected highlight (A1)
+    applySelectedHighlight();
+    
+    // Two panel navigation functionality
+    function initTwoPanelNavigation() {
+      // Hide all sections initially except the first one
+      document.querySelectorAll('.content-section').forEach((section, index) => {
+        if (index === 0) {
+          section.style.display = 'block';
+        } else {
+          section.style.display = 'none';
+        }
+      });
+      
+      // Function to update content
+      function updateContent(link) {
+        // Remove active class from all links
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        
+        // Add active class to current link
+        link.classList.add('active');
+        
+        // Hide all sections
+        document.querySelectorAll('.content-section').forEach(section => {
+          section.style.display = 'none';
+        });
+        
+        // Show target section
+        const targetId = link.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+        
+        if (targetSection) {
+          targetSection.style.display = 'block';
+          
+          // Update lastSelectedTier and selectedTier based on the navigation item
+          // Parse the ID to get tier and column info
+          const match = targetId.match(/(data-pipeline|feature-engineering|ml-architecture|inference-system)-([a-d])(\d)/);
+          if (match) {
+            const prefix = match[1];
+            const letter = match[2].toUpperCase();
+            const tierNum = parseInt(match[3]) - 1;
+            const colIdx = letter.charCodeAt(0) - 65; // A=0, B=1, C=2, D=3
+            lastSelectedTier = { tierIdx: tierNum, colIdx: colIdx };
+            selectedTier = { tierIdx: tierNum, colIdx: colIdx };
+            
+            // Update the diagram to show the selection
+            clearHighlight();
+          }
+        }
+      }
+      
+      // Handle navigation clicks
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // If it's a header link, show all its sub-sections
+          if (this.classList.contains('nav-header')) {
+            const categoryMap = {
+              '#data-pipeline': ['data-pipeline-a1', 'data-pipeline-a2', 'data-pipeline-a3'],
+              '#feature-engineering': ['feature-engineering-b1', 'feature-engineering-b2', 'feature-engineering-b3', 'feature-engineering-b4'],
+              '#ml-architecture': ['ml-architecture-c1', 'ml-architecture-c2', 'ml-architecture-c3'],
+              '#inference-system': ['inference-system-d1', 'inference-system-d2']
+            };
+            
+            const targetId = this.getAttribute('href');
+            const sectionIds = categoryMap[targetId];
+            
+            if (sectionIds) {
+              // Remove active class from all links
+              document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+              
+              // Add active class to header and its children
+              this.classList.add('active');
+              sectionIds.forEach(id => {
+                const childLink = document.querySelector(`a[href="#${id}"]`);
+                if (childLink) childLink.classList.add('active');
+              });
+              
+              // Hide all sections first
+              document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+              });
+              
+              // Show all sections in this category
+              sectionIds.forEach(id => {
+                const section = document.getElementById(id);
+                if (section) section.style.display = 'block';
+              });
+              
+              // Update diagram to show first item of this category
+              const categoryIndex = ['#data-pipeline', '#feature-engineering', '#ml-architecture', '#inference-system'].indexOf(targetId);
+              if (categoryIndex !== -1) {
+                selectedTier = { tierIdx: 0, colIdx: categoryIndex };
+                clearHighlight();
+              }
+            }
+          } else {
+            // Regular sub-item click
+            updateContent(this);
+          }
+          
+          // Scroll to top of content panel on click
+          const rightPanel = document.querySelector('.w-2\\/3.overflow-y-auto');
+          if (rightPanel) {
+            rightPanel.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
+          }
+        });
+        
+        // Handle navigation hover (excluding header links)
+        if (!link.classList.contains('nav-header')) {
+          link.addEventListener('mouseenter', function() {
+            updateContent(this);
+          });
+        }
+      });
+    }
+    
+    // Mobile-specific initialization
+    if (window.innerWidth < 768) {
+      // On mobile, show only the first section by default
+      document.querySelectorAll('.content-section').forEach((section, index) => {
+        section.style.display = index === 0 ? 'block' : 'none';
+      });
+      
+      // Set the dropdown to the first option
+      const mobileNav = document.getElementById('mobile-nav');
+      if (mobileNav && mobileNav.options.length > 1) {
+        mobileNav.selectedIndex = 1; // Select first actual option (after "Select a section...")
+      }
+    }
+    
+    // Handle window resize to adjust behavior
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const isMobile = window.innerWidth < 768;
+        if (isMobile) {
+          // On mobile, show only the currently selected content
+          const mobileNav = document.getElementById('mobile-nav');
+          if (mobileNav && mobileNav.value) {
+            const targetSection = document.querySelector(mobileNav.value);
+            document.querySelectorAll('.content-section').forEach(section => {
+              section.style.display = section === targetSection ? 'block' : 'none';
+            });
+          } else {
+            // Default to first section if nothing selected
+            document.querySelectorAll('.content-section').forEach((section, index) => {
+              section.style.display = index === 0 ? 'block' : 'none';
+            });
+          }
+        } else {
+          // On desktop, show only the selected content
+          const prefix = ['data-pipeline', 'feature-engineering', 'ml-architecture', 'inference-system'][selectedTier.colIdx];
+          const letter = String.fromCharCode(65 + selectedTier.colIdx).toLowerCase();
+          const targetId = `${prefix}-${letter}${selectedTier.tierIdx + 1}`;
+          
+          document.querySelectorAll('.content-section').forEach(section => {
+            section.style.display = section.id === targetId ? 'block' : 'none';
+          });
+        }
+      }, 250);
+    });
+  </script>
+
+
+
+  <script src="../components/footer.js"></script>
+
+</body>
+</html>

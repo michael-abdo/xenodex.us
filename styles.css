@@ -1,0 +1,1675 @@
+:root {
+    --silver: #C0C0C0;      /* Silver Mist - core metal color */
+    --light-silver: #D8D8D8; /* Lighter silver - for accents */
+    --bright-silver: #E8E8E8; /* Bright silver - reflective highlights */
+    --chrome: #B8B8B8;       /* Chrome metal - for metallic effects */
+    --chrome-dark: #A0A0A0;  /* Darker chrome - for depth */
+    --chrome-light: #DDDDDD; /* Light chrome - for highlights */
+    --text: #000000;         /* Black - for text */
+    --text-light: #F4F4F4;   /* Soft White - for light text */
+    --background: #F1F1F1;   /* Soft silver-white - minimalist base */
+    --background-alt: #E8E8E8; /* Light silver background */
+    --dark: #000000;         /* Pure Black - for contrast */
+    
+    /* Metallic gradients */
+    --silver-gradient: linear-gradient(145deg, #D8D8D8, #B8B8B8, #C0C0C0, #D8D8D8);
+    --chrome-gradient: linear-gradient(135deg, #CFCFCF, #B8B8B8, #DDDDDD, #A9A9A9, #C5C5C5);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: var(--background);
+    position: relative;
+    overflow-x: hidden;
+    background-image: 
+        radial-gradient(ellipse at top, #F8F8F8, #F1F1F1),
+        linear-gradient(135deg, 
+            #F5F5F5 0%,
+            #EEEEEE 25%,
+            #F2F2F2 50%,
+            #E8E8E8 75%,
+            #F0F0F0 100%
+        ),
+        linear-gradient(45deg, 
+            rgba(255, 255, 255, 0.1) 25%, 
+            transparent 25%, 
+            transparent 50%, 
+            rgba(255, 255, 255, 0.1) 50%, 
+            rgba(255, 255, 255, 0.1) 75%, 
+            transparent 75%, 
+            transparent);
+    background-size: 100%, 100%, 100px 100px;
+    background-attachment: fixed;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Add subtle metallic texture overlay */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(255,255,255,0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%),
+        linear-gradient(45deg, transparent 49%, rgba(255,255,255,0.02) 50%, transparent 51%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    line-height: 1.7;
+    background-color: var(--background);
+    font-weight: 400;
+    font-size: 1.4rem;
+}
+
+.container {
+    width: 100%;
+    padding: 0 3%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Header */
+header {
+    background-color: #111111;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    will-change: opacity;
+    transition: opacity 0.1s linear;
+}
+
+header .container {
+    display: flex;
+    flex-direction: row; /* Keep header as row */
+    justify-content: flex-start; /* Logo on far left */
+    align-items: center;
+    padding: 15px 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+    filter: brightness(1.2);
+    vertical-align: middle;
+}
+
+.logo-text {
+    font-size: 1.3rem;
+    color: #FFFFFF;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+}
+
+nav ul li {
+    margin-left: 30px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #FFFFFF;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 1rem;
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(145deg, 
+        #F2F2F2 0%, 
+        #E8E8E8 15%, 
+        #D8D8D8 25%, 
+        #B8B8B8 35%, 
+        #C0C0C0 50%, 
+        #D5D5D5 65%, 
+        #D8D8D8 75%, 
+        #E0E0E0 85%, 
+        #F0F0F0 100%
+    );
+    background-size: 400% 400%;
+    color: var(--text);
+    min-height: 100vh; /* Hero always full viewport height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        inset 0 2px 8px rgba(255, 255, 255, 0.6),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.1),
+        0 12px 40px rgba(0, 0, 0, 0.15),
+        0 4px 16px rgba(0, 0, 0, 0.1);
+    transition: background-position 0.5s ease-out;
+    --scroll-progress: 0;
+    padding: 0; /* Remove padding since we're using flex centering */
+}
+
+.hero .hero-line {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.outline-callout {
+    margin: 15px auto 25px;
+    padding: 15px 25px;
+    border-left: 4px solid var(--dark);
+    background: rgba(0, 0, 0, 0.03);
+    font-style: italic;
+}
+
+.barriers-block {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.barriers-block h3 {
+    font-size: 1.2rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 20px;
+}
+
+.barriers-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.barriers-list li {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    line-height: 1.5;
+}
+
+.barriers-list li:last-child {
+    border-bottom: none;
+}
+
+.behavior-content {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.behavior-callout {
+    background: rgba(255, 255, 255, 0.07);
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    letter-spacing: 0.03em;
+}
+
+.behavior-story {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    line-height: 1.7;
+}
+
+.behavior-story h3 {
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.behavior-story p {
+    margin-bottom: 18px;
+}
+
+.behavior-story p:last-child {
+    margin-bottom: 0;
+}
+
+.behavior-era {
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-right: 6px;
+}
+
+.tool-arc {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.tool-arc img {
+    width: 100%;
+    max-width: 640px;
+    align-self: center;
+    display: block;
+}
+
+.tool-story {
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+.trend-note {
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(
+            circle at var(--reflection-position, 50%) 50%, 
+            rgba(255, 255, 255, 0.6) 0%, 
+            transparent 70%
+        );
+    z-index: 1;
+    opacity: var(--scroll-progress, 0.3);
+    transition: none;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0) 20%,
+            rgba(255, 255, 255, 0.4) 25%,
+            rgba(255, 255, 255, 0) 30%,
+            transparent 100%
+        );
+    background-size: 200% 100%;
+    background-position: var(--reflection-position, 0%) 0;
+    z-index: 2;
+    transform: skewX(-20deg);
+    opacity: var(--scroll-progress, 0);
+    transition: none;
+}
+
+.hero .container {
+    position: relative;
+    z-index: 2;
+    padding-top: 60px; /* Account for header height */
+    width: 90%;
+    max-width: 1200px;
+}
+
+.hero h1 {
+    font-size: 4rem;
+    width: 100%;
+    margin: 0 0 20px;
+    line-height: 1.2;
+    font-weight: 800;
+    position: relative;
+    display: block;
+    color: #000;
+    padding: 10px 0;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    white-space: normal; /* Ensure line breaks are respected */
+}
+
+/* Class added when scrolling */
+.hero h1.scrolling-shine {
+    color: #000;
+    position: relative;
+    overflow: hidden;
+}
+
+.subtitle {
+    font-size: 1.7rem;
+    width: 100%;
+    margin: 0;
+    color: #000;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 15px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.subtitle::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--chrome-dark) 20%,
+        var(--silver) 50%,
+        var(--chrome-dark) 80%,
+        transparent 100%
+    );
+}
+
+/* Gradient Sweep Section - Horizontal metallic gradient effects */
+.gradient-sweep-section {
+    padding: 60px 0;
+    background: linear-gradient(135deg, 
+        #F0F0F0 0%, 
+        #E5E5E5 12%, 
+        #CFCFCF 25%, 
+        #B8B8B8 35%, 
+        #DDDDDD 45%, 
+        #A9A9A9 55%, 
+        #C5C5C5 65%, 
+        #D8D8D8 75%, 
+        #E8E8E8 88%, 
+        #F2F2F2 100%
+    );
+    background-size: 400% 400%;
+    position: relative;
+    overflow: hidden;
+    transition: background-position 0.8s ease-out;
+    --scroll-progress: 0;
+    box-shadow: 
+        inset 0 2px 6px rgba(255, 255, 255, 0.5),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.1),
+        0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.gradient-sweep-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        repeating-linear-gradient(
+            45deg,
+            rgba(255,255,255,0.05) 0px,
+            rgba(255,255,255,0.05) 1px,
+            transparent 1px,
+            transparent 15px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            rgba(255,255,255,0.05) 0px,
+            rgba(255,255,255,0.05) 1px,
+            transparent 1px,
+            transparent 15px
+        );
+    z-index: 1;
+    transition: transform 0.5s ease-out;
+    transform: translateY(calc(var(--scroll-progress, 0) * -15px));
+}
+
+.gradient-sweep-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.1) 15%,
+            rgba(255, 255, 255, 0.3) 30%,
+            rgba(255, 255, 255, 0.6) 50%,
+            rgba(255, 255, 255, 0.3) 70%,
+            rgba(255, 255, 255, 0.1) 85%,
+            transparent 100%
+        );
+    background-size: 200% 100%;
+    background-position: var(--reflection-position, 0%) 0;
+    z-index: 2;
+    opacity: var(--scroll-progress, 0.3);
+    transition: none;
+}
+
+.section-content {
+    /* BACKGROUND BLEND TEST: Removed styling to blend with section background */
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 3;
+    padding: 0 10%;
+    transition: transform 0.3s ease;
+    margin: 0 auto;
+    max-width: 1200px;
+}
+
+/* Content-based sections use full page width with minimal side padding */
+.section-content.full-width {
+    max-width: none;
+    padding: 0 5%;
+}
+
+.section-content p {
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+    line-height: 1.6;
+    max-width: 750px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+/* REMOVED: Deprecated content-text class - use lead paragraph instead */
+
+/* REMOVED: Deprecated section-header class - use div.section-header with .section-title instead */
+
+.intro-blend {
+    font-size: 2.1rem;
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-style: italic;
+    font-weight: 600;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+    display: inline-block;
+    margin-right: 1px;
+    position: relative;
+}
+
+.section-content p.lead {
+    font-size: 1.5rem;
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-weight: 400;
+    padding-bottom: 25px;
+    margin-top: 10px;
+    margin-bottom: 0;
+    color: #000;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+    position: relative;
+    letter-spacing: 0.01em;
+    max-width: 1000px;
+    line-height: 1.7;
+    text-align: left;
+    white-space: pre-line;
+}
+
+/* Removed lead::after line separator */
+
+/* REMOVED: Deprecated empirical-subheader class - use section-subtitle instead */
+
+/* Section Header Container */
+.section-header {
+    text-align: center;
+    margin-top: 2rem;
+    margin-bottom: 0.25rem;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.section-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--chrome) 50%,
+        transparent 100%
+    );
+}
+
+/* Section Title - Large main headers */
+.section-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #000000;
+    letter-spacing: -0.02em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    margin-bottom: 0;
+    text-transform: uppercase;
+}
+
+/* Section Subtitle - Descriptive text below title */
+.section-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.5rem;
+    color: #1a1a1a;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    line-height: 1.8;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 2.5rem;
+    }
+    
+    .section-subtitle {
+        font-size: 1.25rem;
+    }
+}
+
+.section-content p.highlight {
+    font-size: 2.3rem;
+    font-weight: 800;
+    margin: 80px auto 20px;
+    position: relative;
+    display: block;
+    color: #000;
+    padding: 20px 0;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    max-width: 800px;
+    line-height: 1.4;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    text-align: center;
+    overflow-wrap: break-word;
+    hyphens: none;
+    text-wrap: balance;
+    word-spacing: 0.05em;
+}
+
+.section-content p.highlight.active-shine {
+    position: relative;
+}
+
+.section-content p.highlight::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(192, 192, 192, 0.3) 20%,
+        rgba(255, 255, 255, 0.8) 50%,
+        rgba(192, 192, 192, 0.3) 80%,
+        transparent 100%
+    );
+    opacity: 0.3;
+    transition: opacity 0.3s ease-out;
+}
+
+.section-content p.highlight::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(192, 192, 192, 0.3) 20%,
+        rgba(255, 255, 255, 0.8) 50%,
+        rgba(192, 192, 192, 0.3) 80%,
+        transparent 100%
+    );
+    opacity: 0.3;
+    transition: opacity 0.3s ease-out;
+}
+
+.section-content p.highlight.active-shine::before,
+.section-content p.highlight.active-shine::after {
+    opacity: 1;
+    background-position: center center;
+    transition: none;
+}
+
+/* Diagonal Rays Section - Light rays with diagonal motion */
+.diagonal-rays-section {
+    padding: 60px 0;
+    background: linear-gradient(
+        145deg,
+        #F2F2F2 0%,
+        #E5E5E5 15%,
+        #CCCCCC 30%,
+        #DDDDDD 45%,
+        #C5C5C5 60%,
+        #D8D8D8 75%,
+        #E8E8E8 90%,
+        #F0F0F0 100%
+    );
+    background-size: 400% 400%;
+    position: relative;
+    overflow: hidden;
+    --scroll-progress: 0;
+    box-shadow: 
+        inset 0 2px 6px rgba(255, 255, 255, 0.5),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.1),
+        0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.diagonal-rays-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.7) 0%,
+            rgba(220, 220, 220, 0.4) 50%,
+            rgba(192, 192, 192, 0.7) 100%
+        );
+    z-index: 1;
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+    transform: translateY(calc(var(--scroll-progress) * -30px));
+    opacity: calc(0.5 + (var(--scroll-progress) * 0.5));
+}
+
+.diagonal-rays-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.1) 20%,
+            rgba(255, 255, 255, 0.4) 25%,
+            rgba(255, 255, 255, 0.1) 30%,
+            transparent 100%
+        );
+    background-size: 200% 100%;
+    background-position: var(--ray-position, 0%) 0;
+    z-index: 2;
+    transition: none;
+    opacity: var(--scroll-progress, 0.2);
+    transform: skewX(-20deg) scale(2);
+}
+
+/* Approach section now uses section-content class for consistent styling */
+.diagonal-rays-section .section-content {
+    margin-top: 0;
+    padding-top: 20px;
+}
+
+/* Approach section now uses section-header class for headings */
+
+/* Add styles for new elements */
+.sub-text {
+    font-size: 1.1rem;
+    font-style: italic;
+    margin: 10px auto 30px;
+    max-width: 650px;
+    opacity: 0.7;
+    color: #444;
+}
+
+.divider {
+    height: 1px;
+    width: 150px;
+    margin: 0 auto 30px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.3) 50%,
+        transparent 100%
+    );
+}
+
+/* Section CTA styling - for call-to-action buttons/links at the end of sections */
+.section-content .section-cta {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: -20px;
+}
+
+.section-content .section-cta .email-link {
+    display: inline-block;
+    margin-top: 0;
+}
+
+/* Approach section now uses lead class for paragraph text */
+
+/* Using section-header class for consistent styling */
+
+/* Now using highlight class for emphasis text */
+
+/* Now using highlight class active-shine styling */
+
+/* The highlight-text class has been replaced by the highlight class */
+
+/* No longer needed - using highlight class styling */
+
+/* Radial Pulse Section - Concentric metallic ripples emanating from off-center */
+.radial-pulse-section {
+    padding: 60px 0;
+    background: radial-gradient(
+        circle at 65% 35%,
+        #F0F0F0 0%,
+        #E0E0E0 10%,
+        #D0D0D0 20%,
+        #C5C5C5 30%,
+        #B8B8B8 40%,
+        #C0C0C0 50%,
+        #C8C8C8 60%,
+        #D5D5D5 70%,
+        #E0E0E0 85%,
+        #F2F2F2 100%
+    );
+    background-size: 200% 200%;
+    position: relative;
+    overflow: hidden;
+    --scroll-progress: 0;
+    box-shadow: 
+        inset 0 2px 6px rgba(255, 255, 255, 0.5),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.1),
+        0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: background-position 0.8s ease-out;
+}
+
+.radial-pulse-section::before {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 60%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle at center,
+        transparent 0%,
+        rgba(255, 255, 255, 0.1) 20%,
+        rgba(255, 255, 255, 0.3) 30%,
+        rgba(255, 255, 255, 0.1) 40%,
+        transparent 50%
+    );
+    transform: translate(-50%, -50%) scale(var(--scroll-progress, 0.5)) rotate(15deg);
+    z-index: 1;
+    opacity: var(--scroll-progress, 0.3);
+    transition: transform 0.8s ease-out, opacity 0.5s ease-out;
+}
+
+.radial-pulse-section::after {
+    content: '';
+    position: absolute;
+    top: 55%;
+    left: 45%;
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(
+        ellipse at center,
+        transparent 30%,
+        rgba(255, 255, 255, 0.2) 40%,
+        rgba(255, 255, 255, 0.4) 45%,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 60%
+    );
+    transform: translate(-50%, -50%) scale(calc(1.5 - var(--scroll-progress, 0.5))) rotate(-20deg);
+    z-index: 2;
+    opacity: calc(var(--scroll-progress, 0.3) * 0.7);
+    transition: transform 0.8s ease-out, opacity 0.5s ease-out;
+}
+
+/* Diagonal Flow Section - Subtle diagonal gradient movement */
+.diagonal-flow-section {
+    padding: 60px 0;
+    background: linear-gradient(
+        160deg,
+        #F0F0F0 0%,
+        #E5E5E5 25%,
+        #D8D8D8 45%,
+        #C8C8C8 65%,
+        #D5D5D5 85%,
+        #E8E8E8 100%
+    );
+    background-size: 250% 250%;
+    position: relative;
+    overflow: hidden;
+    --scroll-progress: 0;
+    box-shadow: 
+        inset 0 2px 6px rgba(255, 255, 255, 0.5),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.1),
+        0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: background-position 0.8s ease-out;
+}
+
+.diagonal-flow-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        -30deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.08) 48%,
+        rgba(255, 255, 255, 0.15) 52%,
+        rgba(255, 255, 255, 0.08) 56%,
+        transparent 64%
+    );
+    z-index: 1;
+    opacity: var(--scroll-progress, 0.4);
+    transform: translateX(calc(var(--scroll-progress, 0) * -80px)) translateY(calc(var(--scroll-progress, 0) * 40px));
+    transition: transform 0.8s ease-out, opacity 0.5s ease-out;
+}
+
+/* Gradient Shimmer Section - Subtle multi-directional gradient shifts */
+.gradient-shimmer-section {
+    padding: 60px 0;
+    background: linear-gradient(
+        125deg,
+        #F2F2F2 0%,
+        #E8E8E8 20%,
+        #D5D5D5 35%,
+        #C0C0C0 50%,
+        #D0D0D0 65%,
+        #E0E0E0 80%,
+        #F0F0F0 100%
+    );
+    background-size: 300% 300%;
+    position: relative;
+    overflow: hidden;
+    --scroll-progress: 0;
+    box-shadow: 
+        inset 0 2px 6px rgba(255, 255, 255, 0.5),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.1),
+        0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: background-position 0.8s ease-out;
+}
+
+.gradient-shimmer-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.1) 45%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.1) 55%,
+        transparent 70%
+    );
+    z-index: 1;
+    opacity: var(--scroll-progress, 0.3);
+    transform: translateX(calc(var(--scroll-progress, 0) * 100px)) translateY(calc(var(--scroll-progress, 0) * -30px));
+    transition: transform 0.8s ease-out, opacity 0.5s ease-out;
+}
+
+/* Vertical Cascade Section - Vertical waterfall effect for CTAs */
+.vertical-cascade-section {
+    padding: 60px 0;
+    background: linear-gradient(
+        to bottom,
+        #F2F2F2 0%,
+        #E8E8E8 15%,
+        #D8D8D8 30%,
+        #C8C8C8 45%,
+        #B8B8B8 60%,
+        #C5C5C5 75%,
+        #D5D5D5 90%,
+        #E0E0E0 100%
+    );
+    background-size: 100% 400%;
+    position: relative;
+    overflow: hidden;
+    --scroll-progress: 0;
+    box-shadow: 
+        inset 0 2px 6px rgba(255, 255, 255, 0.5),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.1),
+        0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: background-position 0.8s ease-out;
+}
+
+.vertical-cascade-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(
+            0deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.1) 20%,
+            rgba(255, 255, 255, 0.3) 40%,
+            rgba(255, 255, 255, 0.1) 60%,
+            transparent 100%
+        );
+    background-size: 100% 200%;
+    background-position: 0 var(--scroll-progress, 0%);
+    z-index: 1;
+    opacity: var(--scroll-progress, 0.3);
+    transition: background-position 0.8s ease-out, opacity 0.5s ease-out;
+}
+
+.vertical-cascade-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            rgba(255, 255, 255, 0.05) 0px,
+            rgba(255, 255, 255, 0.05) 2px,
+            transparent 2px,
+            transparent 20px
+        );
+    z-index: 2;
+    opacity: calc(var(--scroll-progress, 0) * 0.6);
+    transform: translateY(calc(var(--scroll-progress, 0) * -50px));
+    transition: transform 0.8s ease-out, opacity 0.5s ease-out;
+}
+
+/* Contact Section */
+.contact {
+    padding: 80px 0;
+    background: linear-gradient(
+        to bottom,
+        #D0D0D0,
+        #C5C5C5
+    );
+    position: relative;
+    text-align: center;
+}
+
+.contact-content {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.contact h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.email-link {
+    font-size: 1.6rem;
+    color: #000;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 5px;
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-style: italic;
+    letter-spacing: 0.03em;
+    transition: color 0.3s ease;
+}
+
+.email-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.email-link:hover {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.email-link:hover::after {
+    height: 2px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Footer styling with graphite finish */
+footer {
+    background-color: #111111;
+    color: #E0E0E0;
+    padding: 20px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: 
+        linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 100%
+        );
+}
+
+footer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(
+            45deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.03) 30%,
+            rgba(255, 255, 255, 0.05) 50%,
+            rgba(255, 255, 255, 0.03) 70%,
+            transparent 100%
+        );
+    pointer-events: none;
+    animation: footerShine 8s infinite alternate ease-in-out;
+}
+
+@keyframes footerShine {
+    0% {transform: translateX(-50px) skewX(-20deg);}
+    100% {transform: translateX(50px) skewX(-20deg);}
+}
+
+footer .container p {
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    position: relative;
+    display: inline-block;
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+@media (max-width: 768px) {
+    footer {
+        padding: 15px 0;
+    }
+    
+    footer .container p {
+        font-size: 0.9rem;
+        letter-spacing: 0.08em;
+    }
+    
+    footer .container p::before,
+    footer .container p::after {
+        width: 20px;
+    }
+    
+    footer .container p::before {
+        left: -25px;
+    }
+    
+    footer .container p::after {
+        right: -25px;
+    }
+}
+
+footer .container p::before,
+footer .container p::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 30px;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.5),
+        transparent
+    );
+    opacity: 0.8;
+}
+
+footer .container p::before {
+    left: -40px;
+}
+
+footer .container p::after {
+    right: -40px;
+}
+
+/* Add styles for scroll-based effects */
+.section-content, .approach-text {
+    opacity: 0.3;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease, box-shadow 0.8s ease;
+}
+
+.section-content.visible, .approach-text.visible {
+    opacity: 1 !important;
+    transform: translateY(-5px);
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.12),
+        0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Pillars */
+.pillars {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 50px;
+}
+
+.pillar {
+    text-align: center;
+    padding: 30px;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+    width: 30%;
+}
+
+.pillar:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.pillar h3 {
+    margin-bottom: 15px;
+    color: var(--primary);
+    font-size: 1.4rem;
+}
+
+.pillar p {
+    font-size: 1.1rem;
+}
+
+/* Values Section */
+.values {
+    padding: 100px 0;
+    background-color: var(--background);
+}
+
+.values h2 {
+    margin-bottom: 50px;
+    text-align: center;
+    font-size: 2.2rem;
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.value-card {
+    padding: 35px;
+    border-radius: 8px;
+    background-color: var(--background-alt);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.value-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.value-card h3 {
+    margin-bottom: 15px;
+    color: var(--primary);
+    font-size: 1.3rem;
+}
+
+/* Contact Section */
+.contact {
+    padding: 100px 0;
+    background-color: var(--secondary);
+    color: var(--text-light);
+    text-align: center;
+}
+
+.contact h2 {
+    margin-bottom: 20px;
+    font-size: 2.2rem;
+}
+
+.contact p {
+    max-width: 600px;
+    margin: 0 auto 40px;
+    font-size: 1.2rem;
+}
+
+form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 15px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+}
+
+input::placeholder, textarea::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+textarea {
+    height: 150px;
+    resize: none;
+}
+
+button {
+    background-color: var(--highlight);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 1.1rem;
+}
+
+button:hover {
+    background-color: var(--accent);
+    transform: translateY(-3px);
+}
+
+/* Dark Mode - adjusted to ensure silver stays prominent */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary: #C0C0C0;      /* Silver Mist - core metal color */
+        --secondary: #D8D8D8;    /* Lighter silver - for accents */
+        --accent: #A9A9A9;       /* Darker silver for depth */
+        --highlight: #F5F5F5;    /* Almost white - gleaming reflections */
+        --chrome: #888888;       /* Mid-tone silver */
+        --text: #000000;         /* Keep text black in dark mode too */
+        --text-light: #000000;   /* Keep text black in dark mode too */
+        --background: #C0C0C0;   /* Silver background for dark mode */
+        --background-alt: #D0D0D0; /* Slightly lighter background */
+        --dark: #000000;         /* Pure black for contrast */
+    }
+    
+    .logo-dark {
+        display: none;
+    }
+    
+    .logo-light {
+        display: block;
+    }
+    
+    .section-content p.highlight {
+        text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.4);
+        color: #000;
+    }
+    
+    .approach-text p.emphasis {
+        color: #000;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    
+    .hero h1, .subtitle, .section-content h2, .section-content p,
+    .section-content p.lead, footer {
+        color: #000;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Ensure navigation links remain white in dark mode */
+    header nav ul li a {
+        color: #FFFFFF;
+        text-shadow: none;
+    }
+    
+    body {
+        background-image: 
+            linear-gradient(135deg, 
+                rgba(200, 200, 200, 0.8) 0%,
+                rgba(220, 220, 220, 0.9) 50%,
+                rgba(190, 190, 190, 0.8) 100%
+            ),
+            linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.1) 25%, 
+                transparent 25%, 
+                transparent 50%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0.1) 75%, 
+                transparent 75%, 
+                transparent);
+    }
+}
+
+/* Effects Toggle Button - Hidden */
+.effects-toggle {
+    display: none;
+}
+
+.effects-disabled .hero::before,
+.effects-disabled .hero::after,
+.effects-disabled .gradient-sweep-section::before,
+.effects-disabled .gradient-sweep-section::after,
+.effects-disabled .diagonal-rays-section::before,
+.effects-disabled .diagonal-rays-section::after,
+.effects-disabled .radial-pulse-section::before,
+.effects-disabled .radial-pulse-section::after,
+.effects-disabled .diagonal-flow-section::before,
+.effects-disabled .gradient-shimmer-section::before {
+    opacity: 0 !important;
+    transform: none !important;
+}
+
+.effects-disabled .hero,
+.effects-disabled .gradient-sweep-section,
+.effects-disabled .diagonal-rays-section,
+.effects-disabled .radial-pulse-section,
+.effects-disabled .diagonal-flow-section,
+.effects-disabled .gradient-shimmer-section {
+    background-size: 100% 100% !important;
+    transition: none !important;
+    animation: none !important;
+}
+
+.effects-disabled header {
+    opacity: 1 !important;
+}
+
+/* Disable all content reveal animations when effects are off */
+.effects-disabled .section-content {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+/* Disable all highlight effects when effects are off */
+.effects-disabled .section-content p.highlight::before,
+.effects-disabled .section-content p.highlight::after {
+    opacity: 0 !important;
+}
+
+/* Disable footer animation when effects are off */
+.effects-disabled footer::after {
+    animation: none !important;
+    opacity: 0 !important;
+}
+
+/* Medium-sized screens (tablets) */
+@media (max-width: 1024px) and (min-width: 769px) {
+    /* Header improvements for tablets */
+    header .container {
+        padding: 15px 4%;
+    }
+    
+    nav ul li {
+        margin-left: 20px;
+    }
+    
+    nav ul li a {
+        font-size: 0.95rem;
+        letter-spacing: 0.08em;
+    }
+
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+    body {
+        font-size: 1.2rem;
+    }
+
+    /* Header improvements for mobile - more compact */
+    header {
+        padding: 8px 0;
+    }
+    
+    header .container {
+        flex-direction: column;
+        padding: 0 5%;
+    }
+    
+    .logo {
+        margin-bottom: 6px;
+    }
+    
+    .logo img {
+        height: 30px;
+    }
+    
+    .logo-text {
+        font-size: 1.1rem;
+    }
+    
+    nav {
+        width: 100%;
+    }
+    
+    nav ul {
+        margin-top: 4px;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding: 4px 0;
+    }
+    
+    nav ul li {
+        margin: 0;
+    }
+    
+    nav ul li a {
+        font-size: 0.8rem;
+        padding: 5px 8px;
+        white-space: nowrap;
+        letter-spacing: 0.04em;
+    }
+    
+    .hero {
+        min-height: 100vh; /* Hero always full viewport height on mobile */
+    }
+    
+    .hero .container {
+        padding-top: 65px; /* Adjusted for smaller header on mobile */
+    }
+    
+    .hero h1 {
+        font-size: 2.3rem;
+        letter-spacing: -0.01em;
+        line-height: 1.3;
+    }
+    
+    .subtitle {
+        font-size: 1.2rem;
+        letter-spacing: 0.08em;
+    }
+    
+    .section-header {
+        font-size: 1.8rem;
+        letter-spacing: 0.03em;
+        line-height: 1.4;
+    }
+    
+    /* Reduce section padding on mobile */
+    .gradient-sweep-section,
+    .diagonal-rays-section,
+    .radial-pulse-section,
+    .diagonal-flow-section,
+    .gradient-shimmer-section {
+        padding: 45px 0;
+    }
+    
+    .section-content {
+        padding: 0 5%;
+    }
+    
+    .section-content.full-width {
+        padding: 0 3%;
+    }
+    
+    .section-content p.lead {
+        font-size: 1.4rem;
+        line-height: 1.6;
+        padding-bottom: 20px;
+        margin-top: 5px;
+    }
+    
+    .intro-blend {
+        font-size: 1.7rem;
+    }
+    
+    .section-content p.content-text {
+        margin-top: 30px;
+        margin-bottom: 40px;
+        font-size: 1.3rem;
+        line-height: 1.7;
+    }
+    
+    .section-content p.highlight {
+        font-size: 1.5rem;
+        max-width: 95%;
+        line-height: 1.4;
+        padding: 15px 0;
+        margin: 60px auto 15px;
+    }
+    
+    .approach .section-header {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+    
+    .approach .section-content p.highlight {
+        font-size: 1.5rem;
+        padding: 20px 5%;
+    }
+    
+    /* Solution section responsive styles */
+
+    /* Contact section responsive */
+    .contact {
+        padding: 50px 0;
+    }
+    
+    .contact h2 {
+        font-size: 1.6rem;
+        margin-bottom: 15px;
+    }
+    
+    .email-link {
+        font-size: 1.3rem;
+    }
+    
+    .pillars {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .pillar {
+        width: 90%;
+        margin-bottom: 20px;
+    }
+}
+
+/* Very small mobile screens */
+@media (max-width: 480px) {
+    nav ul li a {
+        font-size: 0.7rem;
+        padding: 5px 5px;
+        letter-spacing: 0.01em;
+    }
+    
+    .logo img {
+        height: 28px;
+    }
+    
+    .logo-text {
+        font-size: 1rem;
+    }
+    
+    .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .section-header, 
+    .approach .section-header {
+        font-size: 1.6rem;
+    }
+
+    .section-content p.lead {
+        font-size: 1.2rem;
+    }
+
+    .intro-blend {
+        font-size: 1.5rem;
+    }
+    
+    .section-content p.highlight,
+    .approach .section-content p.highlight {
+        font-size: 1.3rem;
+    }
+
+    .contact h2 {
+        font-size: 1.4rem;
+    }
+    
+    .email-link {
+        font-size: 1.2rem;
+    }
+}

@@ -1,0 +1,154 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="black">
+    Systematic Pipeline Optimization Process
+  </text>
+  
+  <!-- Initial Pipeline (Iteration 1) -->
+  <g transform="translate(50, 60)">
+    <text x="0" y="15" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="black">Iteration 1: All Tier 1</text>
+    
+    <!-- Pipeline stages -->
+    <rect x="0" y="25" width="120" height="40" fill="white" stroke="black" stroke-width="2" rx="5"/>
+    <text x="60" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">Ingestion (T1)</text>
+    
+    <rect x="140" y="25" width="120" height="40" fill="white" stroke="black" stroke-width="2" rx="5"/>
+    <text x="200" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">Feature Eng</text>
+    <text x="200" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">(T1)</text>
+    
+    <rect x="280" y="25" width="120" height="40" fill="white" stroke="black" stroke-width="2" rx="5"/>
+    <text x="340" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">Training</text>
+    <text x="340" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">(T1)</text>
+    
+    <rect x="420" y="25" width="120" height="40" fill="white" stroke="black" stroke-width="2" rx="5"/>
+    <text x="480" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">Inference (T1)</text>
+    
+    <!-- Arrows between stages -->
+    <path d="M 120 45 L 140 45" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <path d="M 260 45 L 280 45" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <path d="M 400 45 L 420 45" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- Performance metrics -->
+    <rect x="560" y="25" width="100" height="40" fill="white" stroke="black" stroke-width="2" rx="5"/>
+    <text x="610" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="black">Metrics:</text>
+    <text x="610" y="52" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="black">Training: 45s</text>
+    <text x="610" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="black">← Bottleneck</text>
+    
+    <path d="M 540 45 L 560 45" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+  </g>
+  
+  <!-- Down arrow -->
+  <path d="M 400 130 L 400 150" stroke="black" stroke-width="3" marker-end="url(#arrowhead)"/>
+  <text x="450" y="145" font-family="Arial, sans-serif" font-size="12" fill="black">Upgrade bottleneck stage</text>
+  
+  <!-- Second Pipeline (Iteration 2) -->
+  <g transform="translate(50, 170)">
+    <text x="0" y="15" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="black">Iteration 2: Training → Tier 2</text>
+    
+    <!-- Pipeline stages -->
+    <rect x="0" y="25" width="120" height="40" fill="white" stroke="black" stroke-width="2" rx="5"/>
+    <text x="60" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">Ingestion (T1)</text>
+    
+    <rect x="140" y="25" width="120" height="40" fill="white" stroke="black" stroke-width="2" rx="5"/>
+    <text x="200" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">Feature Eng</text>
+    <text x="200" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">(T1)</text>
+    
+    <rect x="280" y="25" width="120" height="40" fill="lightgray" stroke="black" stroke-width="3" rx="5"/>
+    <text x="340" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">Training</text>
+    <text x="340" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="black">(T2)</text>
+    
+    <rect x="420" y="25" width="120" height="40" fill="white" stroke="black" stroke-width="2" rx="5"/>
+    <text x="480" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">Inference (T1)</text>
+    
+    <!-- Arrows between stages -->
+    <path d="M 120 45 L 140 45" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <path d="M 260 45 L 280 45" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <path d="M 400 45 L 420 45" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- Performance metrics -->
+    <rect x="560" y="25" width="100" height="40" fill="white" stroke="black" stroke-width="2" rx="5"/>
+    <text x="610" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="black">Metrics:</text>
+    <text x="610" y="52" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="black">Inference: 38s</text>
+    <text x="610" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="black">← Bottleneck</text>
+    
+    <path d="M 540 45 L 560 45" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+  </g>
+  
+  <!-- Down arrow -->
+  <path d="M 400 240 L 400 260" stroke="black" stroke-width="3" marker-end="url(#arrowhead)"/>
+  <text x="450" y="255" font-family="Arial, sans-serif" font-size="12" fill="black">Upgrade bottleneck stage</text>
+  
+  <!-- Third Pipeline (Iteration 3) -->
+  <g transform="translate(50, 280)">
+    <text x="0" y="15" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="black">Iteration 3: Inference → Tier 2</text>
+    
+    <!-- Pipeline stages -->
+    <rect x="0" y="25" width="120" height="40" fill="white" stroke="black" stroke-width="2" rx="5"/>
+    <text x="60" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">Ingestion (T1)</text>
+    
+    <rect x="140" y="25" width="120" height="40" fill="white" stroke="black" stroke-width="2" rx="5"/>
+    <text x="200" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">Feature Eng</text>
+    <text x="200" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">(T1)</text>
+    
+    <rect x="280" y="25" width="120" height="40" fill="lightgray" stroke="black" stroke-width="3" rx="5"/>
+    <text x="340" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">Training</text>
+    <text x="340" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="black">(T2)</text>
+    
+    <rect x="420" y="25" width="120" height="40" fill="lightgray" stroke="black" stroke-width="3" rx="5"/>
+    <text x="480" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="black">Inference</text>
+    <text x="480" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="black">(T2)</text>
+    
+    <!-- Arrows between stages -->
+    <path d="M 120 45 L 140 45" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <path d="M 260 45 L 280 45" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <path d="M 400 45 L 420 45" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- Performance metrics -->
+    <rect x="560" y="25" width="100" height="40" fill="lightgray" stroke="black" stroke-width="2" rx="5"/>
+    <text x="610" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="black">Metrics:</text>
+    <text x="610" y="52" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="black">All stages</text>
+    <text x="610" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="black">optimized ✓</text>
+    
+    <path d="M 540 45 L 560 45" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+  </g>
+  
+  <!-- Legend -->
+  <g transform="translate(50, 380)">
+    <text x="0" y="15" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="black">Key Principles:</text>
+    
+    <rect x="0" y="25" width="15" height="15" fill="white" stroke="black" stroke-width="2"/>
+    <text x="25" y="37" font-family="Arial, sans-serif" font-size="12" fill="black">Tier 1 (Baseline Implementation)</text>
+    
+    <rect x="0" y="50" width="15" height="15" fill="lightgray" stroke="black" stroke-width="2"/>
+    <text x="25" y="62" font-family="Arial, sans-serif" font-size="12" fill="black">Tier 2+ (Optimized Implementation)</text>
+    
+    <text x="0" y="85" font-family="Arial, sans-serif" font-size="12" fill="black">• Pipeline structure remains constant</text>
+    <text x="0" y="105" font-family="Arial, sans-serif" font-size="12" fill="black">• Only bottleneck stages are upgraded</text>
+    <text x="0" y="125" font-family="Arial, sans-serif" font-size="12" fill="black">• Empirical performance metrics drive decisions</text>
+  </g>
+  
+  <!-- Process Flow -->
+  <g transform="translate(450, 380)">
+    <text x="0" y="15" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="black">Optimization Loop:</text>
+    
+    <rect x="0" y="25" width="280" height="120" fill="white" stroke="black" stroke-width="1" rx="5"/>
+    
+    <text x="10" y="45" font-family="Arial, sans-serif" font-size="11" fill="black">1. Run complete pipeline</text>
+    <text x="10" y="60" font-family="Arial, sans-serif" font-size="11" fill="black">2. Profile each stage performance</text>
+    <text x="10" y="75" font-family="Arial, sans-serif" font-size="11" fill="black">3. Identify bottleneck (slowest stage)</text>
+    <text x="10" y="90" font-family="Arial, sans-serif" font-size="11" fill="black">4. Upgrade bottleneck to next tier</text>
+    <text x="10" y="105" font-family="Arial, sans-serif" font-size="11" fill="black">5. Repeat until performance target met</text>
+    
+    <!-- Loop arrow -->
+    <path d="M 250 110 Q 270 120 270 140 Q 270 160 250 150 L 10 150 Q -10 150 -10 130 L -10 50 Q -10 30 10 30 L 120 30" 
+          stroke="black" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  </g>
+  
+  <!-- Arrow marker definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+            refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="black"/>
+    </marker>
+  </defs>
+</svg>
