@@ -1,45 +1,61 @@
 // Universal Header Component for Xenodex
-// This file contains the header HTML and injects it into any page that includes it
+// Logo + persistent academic top-navigation. Injected into every page.
 
-// Execute immediately when script loads (not waiting for DOMContentLoaded)
 (function() {
   // Determine the correct path prefix based on current location
   function getPathPrefix() {
     const path = window.location.pathname;
-    
-    // If we're in the root or index.html
+
+    // Root or index.html
     if (path === '/' || path === '/index.html' || path.endsWith('/xenodex/') || path.endsWith('/xenodex/index.html')) {
       return '';
     }
-    
-    // If we're in pages/templates/ or components/sections/ directory (two levels deep)
+
+    // Two levels deep
     if (path.includes('/pages/templates/') || path.includes('/components/sections/')) {
       return '../../';
     }
-    
-    // If we're in the pages or components directory (one level deep)
-    if (path.includes('/pages/') || path.includes('/components/')) {
+
+    // One level deep (pages/, papers/, components/)
+    if (path.includes('/pages/') || path.includes('/papers/') || path.includes('/components/')) {
       return '../';
     }
-    
-    // Default to current directory
+
     return '';
   }
-  
+
   const pathPrefix = getPathPrefix();
-  
-  // Define the universal header HTML
+  const path = window.location.pathname;
+
+  // Mark the current section's nav link active
+  function activeIf(slug) {
+    return path.includes(slug) ? ' class="active"' : '';
+  }
+
+  const navItems = [
+    { label: 'Research',     href: pathPrefix + 'pages/research.html',     slug: 'research.html' },
+    { label: 'Publications', href: pathPrefix + 'pages/publications.html', slug: 'publications' },
+    { label: 'Methods',      href: pathPrefix + 'pages/methods.html',      slug: 'methods.html' },
+    { label: 'About',        href: pathPrefix + 'pages/about.html',        slug: 'about.html' }
+  ];
+
+  const navLinks = navItems
+    .map(item => `<li><a href="${item.href}"${activeIf(item.slug)}>${item.label}</a></li>`)
+    .join('');
+
   const headerHTML = `
     <header>
-      <div class="container" style="justify-content: flex-start !important; padding-left: 20px !important; margin-left: 0 !important;">
-        <a href="${pathPrefix}index.html" class="logo" style="text-decoration: none; margin-left: 0 !important;">
+      <div class="container academic-bar">
+        <a href="${pathPrefix}index.html" class="logo" style="text-decoration: none;">
           <img src="${pathPrefix}images/logo_white.png" alt="Xenodex Logo">
           <span class="logo-text">XENODEX</span>
         </a>
+        <nav class="site-nav">
+          <ul>${navLinks}</ul>
+        </nav>
       </div>
     </header>
   `;
-  
-  // Write the header immediately
+
   document.write(headerHTML);
 })();

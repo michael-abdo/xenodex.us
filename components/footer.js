@@ -7,7 +7,7 @@
   const footerHTML = `
     <footer>
       <div class="container">
-        <p>&copy; 2025 • XENODEX SCIENCES • Semper Progredi</p>
+        <p>&copy; 2026 • XENODEX SCIENCES • Semper Progredi</p>
       </div>
     </footer>
   `;

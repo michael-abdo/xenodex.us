@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Methods &amp; Reproducibility — Xenodex Sciences</title>
+  <link rel="icon" type="image/png" href="../images/logo_white.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../academic.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <script src="../components/scroll-effects.js"></script>
+</head>
+<body>
+  <script src="../components/header.js"></script>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>Methods &amp; Reproducibility</h1>
+      <p class="subtitle">Pre-registration, frozen estimators, and open data &amp; code</p>
+    </div>
+  </section>
+
+  <!-- 1. Pre-registration -->
+  <section class="gradient-sweep-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Pre-Registration</h2>
+      </div>
+      <div class="research-prose">
+        <p>The directional prediction was committed in writing <em>before</em> the held-out re-run, in two
+        public Open Science Framework pre-registrations:</p>
+        <ul>
+          <li><strong>OSF 10.17605/OSF.IO/SMRXT</strong> — held-out cohort, n = 83.</li>
+          <li><strong>OSF 10.17605/OSF.IO/KJ2RW</strong> — powered replication, n = 549.</li>
+        </ul>
+        <p>A single <strong>frozen estimator</strong> — a whitened linear discriminant on the full
+        40-dimensional Basel Face Model shape coefficient vector, with no per-component selection —
+        was fingerprinted with SHA-256 and timestamped on OSF, then run unchanged on cohorts the
+        discovery analysis never touched. Cross-validation is identity-disjoint (one row per person,
+        leakage-free folds by construction), and the shape vector is sex-residualized — biological sex is
+        read from the annotation record, never inferred from the image — so the apparatus cannot simply
+        re-read demographic sex from the face.</p>
+
+        <div class="key-result">
+          Pre-registered directional prediction · single frozen estimator (whitened-LDA on the
+          40-dim BFM shape vector) · SHA-256-fingerprinted &amp; OSF-timestamped · identity-disjoint
+          cross-validation · sex-residualized · tested on n = 83, then replicated on n = 549.
+        </div>
+
+        <p>Freezing the estimator and the cohort removes the analytic flexibility — post-hoc estimator
+        re-selection, cohort swapping, substitution of discovery numbers — that makes face-to-trait
+        results so frequently irreproducible. The held-out outcome was committed to be reported verbatim,
+        whichever way it fell.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Label-leakage hygiene -->
+  <section class="diagonal-rays-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Label-Leakage Hygiene</h2>
+      </div>
+      <div class="research-prose">
+        <p>A second, standalone methods paper addresses the <strong>shared-provenance failure mode</strong>.
+        When a text channel — an automatic-speech-recognition transcript — and its label both descend from
+        one recording, naive text-to-label prediction scores well for reasons unrelated to the construct:
+        the model re-reads the cues the annotator read, or reads the construct's own jargon spoken aloud.
+        The number is tautological, not evidential.</p>
+
+        <p>We quantified this on a real corpus of <strong>87,943 transcript clips</strong> across
+        <strong>370 human-labeled subjects</strong>, decomposing the contamination into separable
+        leakage and quality channels. The dominant contaminant is attribution: 78.3% of clips are not the
+        subject's speech but two narrator/host voices talking <em>about</em> them, dropped wholesale by
+        narrator person_id. Within the 13,060 remaining real-subject clips, four further channels apply
+        (the flags overlap, so they are reported separately rather than as a disjoint partition):</p>
+
+        <div class="article-body">
+          <table>
+            <thead>
+              <tr><th>Channel</th><th>Effect on the real-subject clips</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Narrator / host speech (Filter 0)</td><td>78.3% of the full corpus — two host voices talking about the subject; dropped wholesale by person_id</td></tr>
+              <tr><td>Typology-jargon leakage</td><td>10.47% leak construct jargon — the transcript literally contains the label</td></tr>
+              <tr><td>Host third-person commentary</td><td>2.72% are narration about the subject mis-attributed to them by the diarizer</td></tr>
+              <tr><td>Within-person near-duplicates</td><td>18.39% are re-cuts or re-uploads that inflate the sample and let one phrasing win a vote</td></tr>
+              <tr><td>Too-short backchannel</td><td>14.89% are sub-sentence fragments (&le; 50 chars) carrying no behavioral signal</td></tr>
+              <tr><td><strong>Survive all filters (CLEAN)</strong></td><td><strong>61.78%</strong> of the real-subject clips pass every filter</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Requiring at least 20 clean clips per subject yields a leakage-screened allowlist of
+        <strong>189 subjects / 5,916 clip IDs</strong>, down from a raw ceiling of 243. Thirty-seven
+        subjects carried at least 20% jargon and would have silently poisoned a raw benchmark.</p>
+
+        <div class="key-result">
+          87,943 clips · 370 subjects audited → 189 subjects / 5,916 clean clip IDs.
+          37 subjects (&ge; 20% jargon) excluded before they could poison a benchmark.
+        </div>
+
+        <p>This is framed as a <strong>gate, not a result</strong>. It removes the crudest input-layer
+        leakage but cannot remove shared-provenance circularity itself: the label was still assigned by a
+        human watching the same recording. A strong text-to-label score therefore stays ambiguous until it
+        is paired with a cross-modal or independent-text guard — predicting from one channel while labeling
+        from another, so the signal can no longer be a single-channel tautology.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Data & code availability -->
+  <section class="radial-pulse-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Data &amp; Code Availability</h2>
+      </div>
+      <div class="research-prose">
+        <p>The frozen artifacts and both pre-registrations are public. The analyses are reproducible from
+        the OSF-timestamped, SHA-256-fingerprinted estimator and the pre-registration records
+        (DOIs 10.17605/OSF.IO/SMRXT and 10.17605/OSF.IO/KJ2RW above). Released material comprises the
+        confirmatory analysis code, the per-coin result tables, the bootstrap and false-discovery-rate
+        outputs, and the leakage-audit allowlists — not the underlying raw media.</p>
+
+        <div class="key-result">
+          The reproducibility ethos: pre-commit the test, freeze the estimator, report the result
+          whichever way it falls.
+        </div>
+
+        <div class="section-cta">
+          <a href="publications.html" class="email-link">Read the papers ▸</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="../components/footer.js"></script>
+</body>
+</html>
