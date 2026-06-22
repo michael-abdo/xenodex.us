@@ -704,6 +704,7 @@ nav ul li a {
             rgba(192, 192, 192, 0.7) 100%
         );
     z-index: 1;
+    pointer-events: none;
     transition: transform 0.5s ease-out, opacity 0.5s ease-out;
     transform: translateY(calc(var(--scroll-progress) * -30px));
     opacity: calc(0.5 + (var(--scroll-progress) * 0.5));
@@ -728,6 +729,7 @@ nav ul li a {
     background-size: 200% 100%;
     background-position: var(--ray-position, 0%) 0;
     z-index: 2;
+    pointer-events: none;
     transition: none;
     opacity: var(--scroll-progress, 0.2);
     transform: skewX(-20deg) scale(2);
@@ -737,6 +739,18 @@ nav ul li a {
 .diagonal-rays-section .section-content {
     margin-top: 0;
     padding-top: 20px;
+}
+
+/* Decorative section overlays must never intercept clicks, or links/buttons
+   sitting under them become dead. (Fixes site-wide unclickable links.) */
+.hero::before, .hero::after,
+.diagonal-rays-section::before, .diagonal-rays-section::after,
+.gradient-sweep-section::before, .gradient-sweep-section::after,
+.diagonal-flow-section::before, .diagonal-flow-section::after,
+.gradient-shimmer-section::before, .gradient-shimmer-section::after,
+.vertical-cascade-section::before, .vertical-cascade-section::after,
+.radial-pulse-section::before, .radial-pulse-section::after {
+    pointer-events: none;
 }
 
 /* Approach section now uses section-header class for headings */
